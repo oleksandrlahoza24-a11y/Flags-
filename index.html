@@ -3,150 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Random GIF Roller</title>
+    <title>Instant GIF Roller</title>
     <style>
-        /* Base styles optimized for iPad */
         body {
             margin: 0;
-            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            background-color: #121212;
+            background-color: #0f0f0f;
             color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, system-ui, sans-serif;
             overflow: hidden;
         }
 
-        #container {
-            text-align: center;
-            width: 90%;
+        #gif-container {
+            width: 90vw;
+            height: 60vh;
             max-width: 600px;
-        }
-
-        /* The GIF display area */
-        #gif-display {
-            width: 100%;
-            height: 400px;
-            margin-bottom: 30px;
+            background: #1a1a1a;
             border-radius: 20px;
-            background: #1e1e1e;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border: 4px solid #333;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid #333;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
 
-        #gif-display img {
+        img {
             max-width: 100%;
             max-height: 100%;
-            display: block;
+            object-fit: contain;
         }
 
-        /* Large, touchable button */
-        #roll-button {
-            padding: 20px 60px;
-            font-size: 24px;
+        .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            padding: 18px 35px;
+            font-size: 20px;
             font-weight: bold;
-            color: white;
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
             border: none;
-            border-radius: 50px;
+            border-radius: 15px;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(110, 142, 251, 0.4);
-            transition: transform 0.1s, box-shadow 0.1s;
-            -webkit-tap-highlight-color: transparent; /* Removes blue box on tap */
+            transition: transform 0.1s;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        #roll-button:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 10px rgba(110, 142, 251, 0.2);
+        .btn-roll {
+            background: linear-gradient(135deg, #ff0080, #7928ca);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 0, 128, 0.4);
         }
 
-        #status {
-            margin-top: 15px;
-            font-size: 14px;
+        .btn-cat {
+            background: linear-gradient(135deg, #0070f3, #00dfd8);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 112, 243, 0.4);
+        }
+
+        button:active {
+            transform: scale(0.92);
+        }
+
+        #loading {
+            display: none;
+            font-size: 18px;
             color: #888;
-        }
-
-        /* Loading spinner */
-        .loader {
-            border: 5px solid #333;
-            border-top: 5px solid #6e8efb;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
-    <div id="container">
-        <div id="gif-display">
-            <div id="placeholder">Tap Roll to Start!</div>
-        </div>
+    <div id="gif-container">
+        <div id="placeholder">Tap a button to roll!</div>
+        <img id="gif-img" style="display:none;">
+    </div>
 
-        <button id="roll-button" onclick="rollGif()">ROLL GIF!</button>
-        <div id="status">Powered by GIPHY</div>
+    <div id="loading">Loading...</div>
+
+    <div class="controls">
+        <button class="btn-roll" onclick="rollAny()">ANY GIF</button>
+        <button class="btn-cat" onclick="rollCat()">RANDOM CAT</button>
     </div>
 
     <script>
-        // Using a public beta API key for demonstration
-        const API_KEY = 'dc6zaTOxFJmzC'; 
-        const display = document.getElementById('gif-display');
-        const button = document.getElementById('roll-button');
+        // A curated list of direct GIF links to ensure it works without an API
+        const gifLibrary = [
+            "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJwamN3bm1yeGR3eXh6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKMGpxxTQH991gk/giphy.gif",
+            "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJwamN3bm1yeGR3eXh6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l41lTfuxV5l6pP50k/giphy.gif",
+            "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJwamN3bm1yeGR3eXh6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/26gsjCZpPolPr3sBy/giphy.gif",
+            "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJwamN3bm1yeGR3eXh6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKSjPjXGvH7a2yA/giphy.gif",
+            "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJwamN3bm1yeGR3eXh6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/l0HlSno8ZvgS2J6G4/giphy.gif",
+            "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJwamN3bm1yeGR3eXh6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o6Zt481isf9KfXY9a/giphy.gif",
+            "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJwamN3bm1yeGR3eXh6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/3o7TKMGpxxTQH991gk/giphy.gif",
+            "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXNoNjB5ZXR6dzh0dzZ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/sIIhZmxQX2fAY/giphy.gif",
+            "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXNoNjB5ZXR6dzh0dzZ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/cuPm4A4pUR9o4/giphy.gif",
+            "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXNoNjB5ZXR6dzh0dzZ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6eXJ6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1n/JIX9t2j0ZTN9S/giphy.gif"
+        ];
 
-        async function rollGif() {
-            // UI Feedback: Disable button and show loader
-            button.disabled = true;
-            button.innerText = "ROLLING...";
-            display.innerHTML = '<div class="loader"></div>';
+        const img = document.getElementById('gif-img');
+        const placeholder = document.getElementById('placeholder');
+        const loading = document.getElementById('loading');
 
-            try {
-                // Fetch a random GIF from Giphy
-                const response = await fetch(`https://api.giphy.com/v1/gifs/random?api_key=${API_KEY}&tag=&rating=g`);
-                const result = await response.json();
+        function showGif(url) {
+            placeholder.style.display = 'none';
+            img.style.display = 'none';
+            loading.style.display = 'block';
 
-                if (result.data && result.data.images.original.url) {
-                    const gifUrl = result.data.images.original.url;
-                    
-                    // Preload the image so it doesn't flicker
-                    const img = new Image();
-                    img.src = gifUrl;
-                    img.onload = () => {
-                        display.innerHTML = `<img src="${gifUrl}" alt="Random GIF">`;
-                        resetButton();
-                    };
-                } else {
-                    throw new Error("No GIF found");
-                }
-            } catch (error) {
-                console.error(error);
-                display.innerHTML = "<div>Error fetching GIF. Try again!</div>";
-                resetButton();
-            }
+            // Create new image to handle loading
+            const newImg = new Image();
+            newImg.src = url;
+            newImg.onload = function() {
+                img.src = url;
+                img.style.display = 'block';
+                loading.style.display = 'none';
+            };
         }
 
-        function resetButton() {
-            button.disabled = false;
-            button.innerText = "ROLL GIF!";
+        // Rolls a random GIF from the hardcoded list
+        function rollAny() {
+            const randomIndex = Math.floor(Math.random() * gifLibrary.length);
+            showGif(gifLibrary[randomIndex]);
         }
 
-        // Prevent zooming on double-tap (common iPad issue)
-        document.addEventListener('touchstart', function (event) {
-            if (event.touches.length > 1) {
-                event.preventDefault();
-            }
+        // Fetches a fresh random cat GIF from Cataas (No API key needed)
+        function rollCat() {
+            // Adding a timestamp prevents the browser from caching the same cat
+            const catUrl = "https://cataas.com/cat/gif?t=" + new Date().getTime();
+            showGif(catUrl);
+        }
+
+        // Prevent iPad double-tap zoom
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
         }, { passive: false });
     </script>
 </body>
