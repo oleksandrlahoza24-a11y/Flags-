@@ -2,178 +2,303 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebForge Playground</title>
-    <!-- Load Monaco Editor and Split.js for the "Cool" UI -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WebForge Pro | Creative IDE</title>
+    
+    <!-- External Libs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
     <style>
-        :root { --bg: #1e1e1e; --sidebar: #252526; --text: #cccccc; --accent: #007acc; }
-        body, html { margin: 0; height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); }
-        
-        /* Layout */
+        :root {
+            --bg: #121212;
+            --sidebar: #181818;
+            --panel: #1e1e1e;
+            --text: #e0e0e0;
+            --accent: #007acc;
+            --border: #333;
+            --editor-shadow: none;
+        }
+
+        /* Cyberpunk Theme */
+        [data-theme="cyberpunk"] {
+            --bg: #0d0221;
+            --sidebar: #0f0a1e;
+            --panel: #1a1b41;
+            --text: #00ff9f;
+            --accent: #ff0055;
+            --border: #ff0055;
+        }
+
+        /* Light Theme */
+        [data-theme="light"] {
+            --bg: #f3f3f3;
+            --sidebar: #e8e8e8;
+            --panel: #ffffff;
+            --text: #333333;
+            --accent: #005fb8;
+            --border: #cccccc;
+        }
+
+        body, html { 
+            margin: 0; height: 100%; overflow: hidden; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg); color: var(--text); 
+            transition: background 0.3s, color 0.3s;
+        }
+
         .container { display: flex; height: 100vh; width: 100vw; }
-        .sidebar { width: 200px; background: var(--sidebar); border-right: 1px solid #333; display: flex; flex-direction: column; }
-        .editor-zone { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
-        .preview-zone { width: 40%; background: white; border-left: 1px solid #333; display: flex; flex-direction: column; position: relative; }
 
-        /* Sidebar & Tabs */
-        .sidebar-header { padding: 10px; font-size: 12px; text-transform: uppercase; opacity: 0.7; display: flex; justify-content: space-between; align-items: center; }
-        .file-list { flex-grow: 1; overflow-y: auto; }
-        .file-item { padding: 8px 15px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-        .file-item:hover { background: #2a2d2e; }
-        .file-item.active { background: #37373d; color: white; border-left: 2px solid var(--accent); }
-        .add-btn { cursor: pointer; padding: 5px; }
+        /* Sidebar */
+        .sidebar { width: 220px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
+        .sidebar-header { padding: 15px; font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); }
+        .file-list { flex-grow: 1; overflow-y: auto; padding-top: 10px; }
+        .file-item { padding: 10px 15px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .file-item:hover { background: rgba(255,255,255,0.05); }
+        .file-item.active { background: var(--accent); color: white; }
 
-        /* Toolbar */
-        .toolbar { height: 40px; background: #333; display: flex; align-items: center; padding: 0 10px; gap: 10px; }
-        .btn { background: var(--accent); color: white; border: none; padding: 5px 12px; cursor: pointer; border-radius: 3px; font-size: 13px; font-weight: bold; }
-        .btn:hover { background: #005a9e; }
-        .btn-fullscreen { position: absolute; bottom: 20px; right: 20px; z-index: 100; opacity: 0.5; }
-        .btn-fullscreen:hover { opacity: 1; }
+        /* Editor Area */
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; min-width: 0; }
+        .toolbar { height: 50px; background: var(--panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 15px; gap: 8px; flex-wrap: nowrap; overflow-x: auto; }
+        
+        .btn { 
+            background: #333; color: white; border: none; padding: 6px 12px; 
+            cursor: pointer; border-radius: 4px; font-size: 12px; display: flex; 
+            align-items: center; gap: 5px; white-space: nowrap; 
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-primary { background: var(--accent); }
+        .btn-danger { background: #b91c1c; }
 
-        /* Editor & Preview */
-        #editor-container { flex-grow: 1; width: 100%; }
+        #editor-container { flex-grow: 1; position: relative; }
+
+        /* Typing Animation Mode */
+        .typing-glow .monaco-editor .view-lines {
+            filter: drop-shadow(0 0 5px var(--accent));
+            animation: textPulse 2s infinite alternate;
+        }
+        @keyframes textPulse { from { opacity: 0.8; } to { opacity: 1; } }
+
+        /* Preview Area */
+        .preview-zone { width: 45%; background: white; border-left: 1px solid var(--border); position: relative; display: flex; flex-direction: column; }
         iframe { width: 100%; height: 100%; border: none; background: white; }
+
+        /* Settings Modal */
+        .modal { 
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: var(--panel); padding: 25px; border-radius: 12px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); z-index: 1000;
+            display: none; width: 300px; border: 1px solid var(--border);
+        }
+        .modal-overlay { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: rgba(0,0,0,0.7); z-index: 999; display: none; 
+        }
+        .settings-row { margin-bottom: 15px; }
+        .settings-row label { display: block; margin-bottom: 5px; font-size: 13px; }
+        select { width: 100%; padding: 8px; border-radius: 4px; background: #333; color: white; border: none; }
+
+        /* Floating Fullscreen */
+        .btn-fullscreen { position: absolute; bottom: 20px; right: 20px; border-radius: 50%; width: 50px; height: 50px; justify-content: center; opacity: 0.6; }
+        
+        @media (max-width: 768px) {
+            .sidebar { width: 50px; }
+            .sidebar-header span, .file-item span { display: none; }
+            .preview-zone { width: 100%; position: absolute; bottom: 0; height: 40%; z-index: 5; }
+        }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
 <div class="container">
-    <!-- 1. File Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <span>Files</span>
-            <i class="fas fa-plus add-btn" onclick="addNewFile()" title="New File"></i>
+            <span>Project</span>
+            <i class="fas fa-plus-circle" onclick="addNewFile()" style="cursor:pointer"></i>
         </div>
         <div id="file-list" class="file-list"></div>
     </div>
 
-    <!-- 2. Code Editor Zone -->
-    <div class="editor-zone">
+    <div class="main-content">
         <div class="toolbar">
-            <span id="current-filename" style="font-size: 13px; flex-grow: 1;">index.html</span>
-            <button class="btn" onclick="runCode()"><i class="fas fa-play"></i> Run Game</button>
+            <button class="btn btn-primary" onclick="runCode()"><i class="fas fa-play"></i> Run</button>
+            <button class="btn" onclick="selectAllText()"><i class="fas fa-mouse-pointer"></i> Select All</button>
+            <button class="btn" onclick="copyAllText()"><i class="fas fa-copy"></i> Copy</button>
+            <button class="btn" onclick="toggleSettings()"><i class="fas fa-cog"></i> Settings</button>
+            <button class="btn" onclick="exportProject()"><i class="fas fa-download"></i> Export</button>
+            <button class="btn btn-danger" onclick="clearAll()" style="margin-left:auto"><i class="fas fa-trash"></i></button>
         </div>
         <div id="editor-container"></div>
     </div>
 
-    <!-- 3. Preview Zone -->
     <div class="preview-zone" id="preview-zone">
         <iframe id="preview-frame" sandbox="allow-scripts allow-modals allow-pointer-lock allow-same-origin"></iframe>
-        <button class="btn btn-fullscreen" onclick="toggleFullscreen()"><i class="fas fa-expand"></i></button>
+        <button class="btn btn-primary btn-fullscreen" onclick="toggleFullscreen()"><i class="fas fa-expand"></i></button>
     </div>
 </div>
 
+<!-- Settings Modal -->
+<div class="modal-overlay" id="overlay" onclick="toggleSettings()"></div>
+<div class="modal" id="settings-modal">
+    <h3>Settings</h3>
+    <div class="settings-row">
+        <label>UI Theme</label>
+        <select onchange="changeTheme(this.value)">
+            <option value="dark">Default Dark</option>
+            <option value="midnight">Deep Midnight</option>
+            <option value="cyberpunk">Cyberpunk Neon</option>
+            <option value="light">Bright Light</option>
+        </select>
+    </div>
+    <div class="settings-row">
+        <label>Visual Effects</label>
+        <select onchange="changeEffects(this.value)">
+            <option value="none">Standard</option>
+            <option value="typing-glow">Hacker Glow</option>
+        </select>
+    </div>
+    <button class="btn btn-primary" style="width:100%" onclick="toggleSettings()">Close</button>
+</div>
+
 <script>
-    // --- VIRTUAL FILE SYSTEM ---
-    let files = {
-        'index.html': { content: '<html>\n<head>\n <link rel="stylesheet" href="style.css">\n</head>\n<body>\n <h1>Hello World</h1>\n <canvas id="game"></canvas>\n <script src="app.js"><\/script>\n</body>\n</html>' },
-        'style.css': { content: 'body { background: #222; color: cyan; text-align: center; }\ncanvas { border: 1px solid white; width: 100%; height: 200px; }' },
-        'app.js': { content: 'console.log("Game running...");\nconst c = document.getElementById("game");\nconst ctx = c.getContext("2d");\nctx.fillStyle = "red";\nctx.fillRect(50, 50, 100, 100);' }
+    // Initial Data
+    let files = JSON.parse(localStorage.getItem('webforge_files')) || {
+        'index.html': { content: '<html>\n<body>\n  <h1 id="title">Click the Box!</h1>\n  <div id="box"></div>\n  \n  <style>\n    body { background: #111; color: #fff; text-align: center; }\n    #box { width: 100px; height: 100px; background: red; margin: auto; transition: 0.3s; cursor: pointer; }\n  </style>\n\n  <script src="script.js"><\/script>\n</body>\n</html>' },
+        'script.js': { content: 'const box = document.getElementById("box");\nbox.onclick = () => {\n  box.style.background = "hsl(" + Math.random()*360 + ", 100%, 50%)";\n  box.style.transform = "scale(1.2) rotate(10deg)";\n  setTimeout(() => box.style.transform = "scale(1)", 200);\n};' }
     };
+
     let activeFile = 'index.html';
     let editor;
 
-    // --- MONACO SETUP ---
+    // --- Editor Setup ---
     require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs' }});
     require(['vs/editor/editor.main'], function () {
         editor = monaco.editor.create(document.getElementById('editor-container'), {
+            value: files[activeFile].content,
+            language: 'html',
             theme: 'vs-dark',
             automaticLayout: true,
-            fontSize: 14,
-            minimap: { enabled: false }
+            fontSize: 16,
+            minimap: { enabled: false },
+            roundedSelection: true,
+            scrollbar: { verticalScrollbarSize: 10 }
         });
 
-        // Save changes to virtual FS on every keystroke
         editor.onDidChangeModelContent(() => {
             files[activeFile].content = editor.getValue();
+            localStorage.setItem('webforge_files', JSON.stringify(files));
         });
 
-        switchFile('index.html');
         updateFileList();
+        switchFile('index.html');
     });
 
-    // --- LOGIC ---
+    // --- File Logic ---
     function updateFileList() {
         const list = document.getElementById('file-list');
         list.innerHTML = '';
-        Object.keys(files).forEach(filename => {
+        Object.keys(files).forEach(name => {
             const div = document.createElement('div');
-            div.className = `file-item ${filename === activeFile ? 'active' : ''}`;
-            div.innerHTML = `<i class="far fa-file-code"></i> ${filename}`;
-            div.onclick = () => switchFile(filename);
+            div.className = `file-item ${name === activeFile ? 'active' : ''}`;
+            div.innerHTML = `<i class="far ${name.endsWith('.js') ? 'fa-file-code' : 'fa-file-alt'}"></i> <span>${name}</span>`;
+            div.onclick = () => switchFile(name);
             list.appendChild(div);
         });
     }
 
-    function switchFile(filename) {
-        activeFile = filename;
-        const extension = filename.split('.').pop();
-        const langMap = { html: 'html', js: 'javascript', css: 'css' };
+    function switchFile(name) {
+        activeFile = name;
+        const ext = name.split('.').pop();
+        const lang = ext === 'js' ? 'javascript' : ext === 'css' ? 'css' : 'html';
         
-        const model = monaco.editor.createModel(files[filename].content, langMap[extension] || 'text');
+        const model = monaco.editor.createModel(files[name].content, lang);
         editor.setModel(model);
-        
-        document.getElementById('current-filename').innerText = filename;
         updateFileList();
     }
 
     function addNewFile() {
-        const name = prompt("Enter filename (e.g. game.js):");
-        if (name && !files[name]) {
+        const name = prompt("Enter filename (e.g. style.css):");
+        if (name) {
             files[name] = { content: '' };
             switchFile(name);
         }
     }
 
-    // --- THE "GATHERING" ENGINE ---
-    // This function finds relative links in the HTML and replaces them with the actual code
+    function clearAll() {
+        if(confirm("Delete all files?")) {
+            localStorage.removeItem('webforge_files');
+            location.reload();
+        }
+    }
+
+    // --- Settings & UI Logic ---
+    function toggleSettings() {
+        const m = document.getElementById('settings-modal');
+        const o = document.getElementById('overlay');
+        const isVisible = m.style.display === 'block';
+        m.style.display = isVisible ? 'none' : 'block';
+        o.style.display = isVisible ? 'none' : 'block';
+    }
+
+    function changeTheme(theme) {
+        document.body.setAttribute('data-theme', theme);
+        const monacoTheme = theme === 'light' ? 'vs' : 'vs-dark';
+        monaco.editor.setTheme(monacoTheme);
+    }
+
+    function changeEffects(fx) {
+        const container = document.getElementById('editor-container');
+        container.className = fx;
+    }
+
+    // --- iPad Utilities ---
+    function selectAllText() {
+        editor.focus();
+        editor.setSelection(editor.getModel().getFullModelRange());
+    }
+
+    async function copyAllText() {
+        const code = editor.getValue();
+        await navigator.clipboard.writeText(code);
+        alert("Copied to clipboard!");
+    }
+
+    // --- Compiler Engine ---
     function runCode() {
         let html = files['index.html'].content;
-
-        // 1. Inject CSS
+        
+        // Inject all JS files manually
         Object.keys(files).forEach(name => {
+            if (name.endsWith('.js') && name !== 'index.html') {
+                const js = `<script>\n${files[name].content}\n<\/script>`;
+                const tag = `<script src="${name}"><\/script>`;
+                if (html.includes(tag)) html = html.replace(tag, js);
+                else html += js;
+            }
             if (name.endsWith('.css')) {
-                const cssContent = `<style>\n${files[name].content}\n</style>`;
-                // Replace <link href="name"> with <style>content</style>
-                const regex = new RegExp(`<link.*?href=["']${name}["'].*?>`, 'g');
-                if (html.match(regex)) {
-                    html = html.replace(regex, cssContent);
-                } else {
-                    html = html.replace('</head>', cssContent + '</head>');
-                }
+                const css = `<style>\n${files[name].content}\n</style>`;
+                const tag = `<link rel="stylesheet" href="${name}">`;
+                if (html.includes(tag)) html = html.replace(tag, css);
+                else html = html.replace('</head>', css + '</head>');
             }
         });
 
-        // 2. Inject JS
-        Object.keys(files).forEach(name => {
-            if (name.endsWith('.js')) {
-                const jsContent = `<script>\n${files[name].content}\n<\/script>`;
-                const regex = new RegExp(`<script.*?src=["']${name}["'].*?><\/script>`, 'g');
-                if (html.match(regex)) {
-                    html = html.replace(regex, jsContent);
-                } else {
-                    html = html.replace('</body>', jsContent + '</body>');
-                }
-            }
-        });
-
-        const frame = document.getElementById('preview-frame');
-        frame.srcdoc = html;
+        document.getElementById('preview-frame').srcdoc = html;
     }
 
     function toggleFullscreen() {
         const zone = document.getElementById('preview-zone');
-        if (!document.fullscreenElement) {
-            zone.requestFullscreen().catch(err => {
-                alert(`Error: ${err.message}`);
-            });
-        } else {
-            document.exitFullscreen();
-        }
+        if (!document.fullscreenElement) zone.requestFullscreen();
+        else document.exitFullscreen();
+    }
+
+    function exportProject() {
+        const blob = new Blob([files['index.html'].content], {type: 'text/html'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'project-export.html';
+        a.click();
     }
 </script>
-
 </body>
 </html>
