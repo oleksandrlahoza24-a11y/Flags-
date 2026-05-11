@@ -3197,10 +3197,11 @@ function palettKey(e) {
 // MENU SYSTEM
 // ═══════════════════════════════════════
 function toggleMenu(name) {
-const el = document.getElementById('menu-' + name);
-if (!el) return;
-const wasOpen = el.classList.contains('open');
-
+  const el = document.getElementById('menu-' + name);
+  if (!el) return;
+  const wasOpen = el.classList.contains('open');
+  closeAllMenus();
+  if (!wasOpen) el.classList.add('open');
 }
 
 function closeAllMenus() {
