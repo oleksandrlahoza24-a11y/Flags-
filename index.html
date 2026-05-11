@@ -1604,7 +1604,8 @@
         File
         <div class="dropdown" id="dropdown-file">
           <div class="dropdown-item" onclick="openNewFileModal()"><i class="fas fa-file-plus"></i> New File
-            <kbd>⌘N</kbd></div>
+            <kbd>⌘N</kbd>
+          </div>
           <div class="dropdown-item" onclick="openNewFolderModal()"><i class="fas fa-folder-plus"></i> New Folder</div>
           <div class="dropdown-item" onclick="uploadFiles()"><i class="fas fa-upload"></i> Upload Files</div>
           <div class="dropdown-sep"></div>
@@ -1636,11 +1637,14 @@
         View
         <div class="dropdown" id="dropdown-view">
           <div class="dropdown-item" onclick="toggleSidebar()"><i class="fas fa-sidebar"></i> Toggle Sidebar
-            <kbd>⌘B</kbd></div>
+            <kbd>⌘B</kbd>
+          </div>
           <div class="dropdown-item" onclick="toggleConsole()"><i class="fas fa-terminal"></i> Toggle Console
-            <kbd>⌘J</kbd></div>
+            <kbd>⌘J</kbd>
+          </div>
           <div class="dropdown-item" onclick="togglePreview()"><i class="fas fa-columns"></i> Toggle Preview
-            <kbd>⌘P</kbd></div>
+            <kbd>⌘P</kbd>
+          </div>
           <div class="dropdown-sep"></div>
           <div class="dropdown-item" onclick="setLayout('split')"><i class="fas fa-columns"></i> Split View</div>
           <div class="dropdown-item" onclick="setLayout('editor')"><i class="fas fa-code"></i> Editor Only</div>
@@ -1650,7 +1654,14 @@
           </div>
         </div>
       </div>
-      <div class="menu-item" onclick="openSettings()">Settings</div>
+      <div class="menu-item" id="menu-plugins" onclick="toggleMenu('plugins')">
+  Plugins <span id="plugin-badge" style="background:var(--accent);color:white;font-size:9px;padding:1px 5px;border-radius:10px;margin-left:3px;display:none">0</span>
+  <div class="dropdown" id="dropdown-plugins">
+    <div class="dropdown-item" onclick="openPluginManager()"><i class="fas fa-puzzle-piece"></i> Plugin Manager</div>
+    <div class="dropdown-item" onclick="openPluginManager();pluginCreate()"><i class="fas fa-plus"></i> New Plugin</div>
+  </div>
+</div>
+<div class="menu-item" id="menu-settings" onclick="openSettings()">Settings</div>
       <div class="menu-spacer"></div>
       <div class="menubar-right">
         <div class="fps-badge" id="fps-badge">60 FPS</div>
@@ -3854,8 +3865,9 @@ function _injectUI() {
 
   // ── Plugins menu in menubar ───────────
   const menubar = document.querySelector('.menubar');
-  if (menubar) {
-  const settingsItem = Array.from(menubar.querySelectorAll('.menu-item')).find(el=>el.childNodes[0]?.textContent.trim()==='Settings');
+  if (menubar) {
+  const settingsItem =
+  Array.from(menubar.querySelectorAll('.menu-item')).find(el=>el.textContent.trim().startsWith('Settings'));
     const menuEl = document.createElement('div');
     menuEl.className='menu-item';
     menuEl.id='menu-plugins';
