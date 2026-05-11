@@ -1681,7 +1681,7 @@ const EXT_LANG = {
   yaml: 'yaml', yml: 'yaml',
   xml: 'xml', svg: 'xml',
   sql: 'sql',
-  sh: 'shell', bash: 'shell', zsh: 'shell',
+  sh: 'shell', bash: 'shell', zsh: 'shell', 
   rs: 'rust',
   go: 'go',
   cpp: 'cpp', c: 'cpp', cc: 'cpp', h: 'cpp',
@@ -2617,6 +2617,7 @@ function palettKey(e) {
 // ═══════════════════════════════════════
 function toggleMenu(name) {
   const el = document.getElementById('menu-' + name);
+  if (!el) return;
   const wasOpen = el.classList.contains('open');
   closeAllMenus();
   if (!wasOpen) el.classList.add('open');
