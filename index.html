@@ -211,6 +211,108 @@
       --danger: #ff0000;
     }
 
+    .sf-match {
+      background: rgba(99, 102, 241, 0.22);
+      border-radius: 2px;
+    }
+
+    @keyframes sbFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes sbGradSpin {
+      0% {
+        background-position: 0% 50%
+      }
+
+      50% {
+        background-position: 100% 50%
+      }
+
+      100% {
+        background-position: 0% 50%
+      }
+    }
+
+    #sb-tooltip {
+      background-size: 300% 300% !important;
+    }
+
+    .tbx-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text);
+      transition: background .14s;
+    }
+
+    .tbx-item:hover {
+      background: var(--panel2);
+    }
+
+    .tbx-item i {
+      width: 14px;
+      text-align: center;
+      color: var(--accent2);
+      flex-shrink: 0;
+    }
+
+    .tbx-sep {
+      height: 1px;
+      background: var(--border);
+      margin: 4px 0;
+    }
+
+    #smart-find-wrap {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    #smart-find-wrap .btn {
+      border: none !important;
+    }
+
+    .sf-match-current {
+      background: rgba(251, 191, 36, 0.45);
+      border-radius: 2px;
+      outline: 1px solid rgba(251, 191, 36, 0.8);
+    }
+
+    @keyframes sf-border-spin {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .toolbar[data-smartfind="on"] {
+      background: linear-gradient(var(--panel2), var(--panel2)) padding-box,
+        linear-gradient(90deg, #6366f1, #a78bfa, #f43f5e, #f59e0b, #22c55e, #6366f1) border-box;
+      background-size: 300% 300%;
+      border-bottom: 2px solid transparent;
+      animation: sf-border-spin 2.8s ease infinite;
+    }
+
     [data-theme="light"] {
       --bg: #f0f0f5;
       --sidebar: #e4e4ec;
@@ -1817,10 +1919,43 @@
           <button class="btn btn-ghost" onclick="editorAction('redo')"><i class="fas fa-redo"></i></button>
           <div class="toolbar-sep"></div>
           <button class="btn btn-ghost" onclick="formatCode()" title="Format Code"><i class="fas fa-magic"></i></button>
-          <button class="btn btn-ghost" onclick="openFind()" title="Find"><i class="fas fa-search"></i></button>
+          <div style="display:inline-flex;align-items:center;gap:0;position:relative" id="smart-find-wrap">
+            <button class="btn btn-ghost" id="smart-find-btn" onclick="toggleSmartFind()" title="Smart Find Mode" style="border-radius:5px 0 0 5px;border-right:1px solid var(--border);padding:0 7px"><i class="fas fa-brain" style="font-size:11px"></i><span style="font-size:10px;margin-left:4px;letter-spacing:.03em">Smart</span></button><button class="btn btn-ghost" onclick="openFind()" title="Find (⌘F)" style="border-radius:0 5px 5px 0;padding:0 7px"><i class="fas fa-search" style="font-size:11px"></i></button>
+          </div>
           <button class="btn btn-ghost" onclick="copyAllText()" title="Copy All"><i class="fas fa-copy"></i></button>
           <div class="toolbar-sep"></div>
           <button class="btn btn-subtle" onclick="exportProject()"><i class="fas fa-download"></i> Export</button>
+          <div style="position:relative;display:inline-flex" id="toolbox-wrap">
+            <button class="btn btn-ghost" id="toolbox-btn" onclick="toggleToolbox()" title="Toolbox" style="gap:4px"><i class="fas fa-toolbox"></i><span style="font-size:10px">Tools</span><i class="fas fa-chevron-down" style="font-size:8px;opacity:.6"></i></button>
+            <div id="toolbox-menu"
+              style="display:none;position:fixed;top:0;right:0;background:var(--panel);border:1px solid var(--border-bright);border-radius:8px;min-width:220px;padding:6px;z-index:9999;box-shadow:0 8px 40px rgba(0,0,0,.6)">
+              <div
+                style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:4px 8px 6px">
+                Tools</div>
+              <div class="tbx-item" onclick="tbxColourWheel()"><i class="fas fa-palette"></i> Colour Wheel</div>
+              <div class="tbx-item" onclick="tbxContrastChecker()"><i class="fas fa-adjust"></i> Contrast Checker</div>
+              <div class="tbx-item" onclick="tbxBase64()"><i class="fas fa-code"></i> Base64 Encode / Decode</div>
+              <div class="tbx-item" onclick="tbxRegexTester()"><i class="fas fa-terminal"></i> Regex Tester</div>
+              <div class="tbx-item" onclick="tbxJsonFormatter()">
+                <i class="fas fa-brackets-curly" style="font-family:monospace;font-style:normal">{}</i> JSON Formatter
+              </div>
+              <div class="tbx-item" onclick="tbxUnitConverter()"><i class="fas fa-ruler-combined"></i> CSS Unit
+                Converter</div>
+              <div class="tbx-sep"></div>
+              <div class="tbx-item" onclick="tbxLineCounter()"><i class="fas fa-list-ol"></i> Line / Word Count</div>
+              <div class="tbx-item" onclick="tbxTimestamp()"><i class="fas fa-clock"></i> Timestamp Generator</div>
+              <div class="tbx-sep"></div>
+              <div
+                style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:4px 8px 2px">
+                New</div>
+              <div class="tbx-item" onclick="tbxMinifier()"><i class="fas fa-compress-alt"></i> CSS / JS Minifier</div>
+              <div class="tbx-item" onclick="tbxShadowBuilder()"><i class="fas fa-clone"></i> Box Shadow Builder</div>
+              <div class="tbx-item" onclick="tbxGradientBuilder()"><i class="fas fa-fill-drip"></i> Gradient Builder
+              </div>
+              <div class="tbx-item" onclick="tbxHtmlEntities()"><i class="fas fa-exchange-alt"></i> HTML Entities</div>
+              <div class="tbx-item" onclick="tbxMetaTags()"><i class="fas fa-tags"></i> Meta Tag Generator</div>
+            </div>
+          </div>
           <button class="btn btn-ghost" onclick="openSettings()"><i class="fas fa-cog"></i></button>
           <button class="btn btn-ghost" onclick="openPalette()" title="Command Palette (⌘K)"><i class="fas fa-search"></i> <span style="font-size:10px;color:var(--text-faint)">⌘K</span></button>
           <div class="lang-badge" id="lang-badge">HTML</div>
@@ -1951,6 +2086,36 @@
           <option value="hc-black">High Contrast</option>
         </select>
         </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Cursor Style</div>
+          </div>
+          <select class="fancy-select" style="width:110px" id="cursor-style-select" onchange="changeCursorStyle(this.value)">
+            <option value="line">Line</option>
+            <option value="block">Block</option>
+            <option value="underline">Underline</option>
+            <option value="line-thin">Line Thin</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Font Ligatures</div>
+            <div style="font-size:10px;color:var(--text-dim)">e.g. → ≥ ≠</div>
+          </div>
+          <button class="toggle on" id="toggle-ligatures" onclick="toggleLigatures(this)"></button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Smooth Scrolling</div>
+          </div>
+          <button class="toggle on" id="toggle-smooth-scroll" onclick="toggleSmoothScroll(this)"></button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Indent Guides</div>
+          </div>
+          <button class="toggle on" id="toggle-indent-guides" onclick="toggleIndentGuides(this)"></button>
+        </div>
       </div>
 
       <div class="settings-group">
@@ -1997,6 +2162,48 @@
             <div class="setting-label">Console Capture</div>
           </div>
           <button class="toggle on" id="toggle-console-cap" onclick="toggleConsoleCap(this)"></button>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Preview Zoom</div>
+          </div>
+          <div class="slider-row" style="width:160px">
+            <input type="range" min="50" max="150" step="5" value="100" id="preview-zoom-slider" oninput="changePreviewZoom(this.value)">
+            <div class="slider-val" id="preview-zoom-val">100%</div>
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Reset on Run</div>
+            <div style="font-size:10px;color:var(--text-dim)">Scroll preview to top on each run</div>
+          </div>
+          <button class="toggle on" id="toggle-reset-scroll" onclick="toggleResetScroll(this)"></button>
+        </div>
+      </div>
+
+      <div class="settings-group"
+        style="border:1px solid transparent;border-radius:8px;background:linear-gradient(var(--panel),var(--panel)) padding-box,linear-gradient(135deg,#6366f1,#a78bfa,#f43f5e,#f59e0b) border-box;padding:2px">
+        <div style="padding:10px 12px">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px">
+            <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;background:linear-gradient(90deg,#a78bfa,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Smart Beta</span>
+            <span style="font-size:9px;background:linear-gradient(90deg,#6366f1,#a78bfa);color:#fff;padding:1px 6px;border-radius:10px;font-weight:700;-webkit-text-fill-color:#fff">BETA</span>
+          </div>
+          <div class="setting-row" style="border:none;padding:0;margin-bottom:6px">
+            <div>
+              <div class="setting-label">Enhanced AI Predictions</div>
+              <div style="font-size:10px;color:var(--text-dim);margin-top:1px">Deeper context, smarter completions,
+                richer suggestions</div>
+            </div>
+            <button class="toggle" id="toggle-smart-beta" onclick="toggleSmartBeta(this)"></button>
+          </div>
+          <div id="smart-beta-details"
+            style="display:none;margin-top:8px;font-size:10px;color:var(--text-dim);line-height:1.9;background:var(--panel2);border-radius:6px;padding:8px 10px">
+            ✦ Analyses full file context before suggesting<br>
+            ✦ Language-aware completions (HTML, CSS, JS, TS)<br>
+            ✦ Animated prediction tooltip with gradient stroke<br>
+            ✦ Higher suggestion depth &amp; detail level<br>
+            <span style="color:var(--warning)">⚡ May add a small latency to completions</span>
+          </div>
         </div>
       </div>
 
@@ -2216,8 +2423,15 @@ console.log('%cWebForge Pro loaded! 🚀', 'color:#6366f1;font-weight:bold;font-
     effects: { glow: false, scanlines: false, crt: false },
     autoRun: false,
     autoRunDelay: 800,
-    consoleCap: true,
-    layout: 'split'
+    consoleCap: true, 
+    layout: 'split', 
+    smartBeta: false, 
+    cursorStyle: 'line', 
+    ligatures: true, 
+    smoothScroll: true,
+    indentGuides: true, 
+    previewZoom: 100, 
+    resetScrollOnRun: true
   }
 };
 
@@ -2476,6 +2690,7 @@ require(['vs/editor/editor.main'], function() {
   buildPaletteCommands();
   runCode();
   startFPSMonitor();
+  if (state.settings.smartBeta) initSmartBeta();
 });
 
 // ═══════════════════════════════════════
@@ -3089,6 +3304,16 @@ function applySettings() {
   updateToggle('toggle-console-cap', s.consoleCap !== false);
   document.getElementById('autorun-delay').value = s.autoRunDelay || 800;
   document.getElementById('autorun-delay-val').textContent = s.autoRunDelay || 800;
+  updateToggle('toggle-smart-beta', s.smartBeta);
+  if (s.smartBeta) document.getElementById('smart-beta-details').style.display = 'block';
+  const css = document.getElementById('cursor-style-select');
+  if (css) css.value = s.cursorStyle || 'line';
+  updateToggle('toggle-ligatures', s.ligatures !== false);
+  updateToggle('toggle-smooth-scroll', s.smoothScroll !== false);
+  updateToggle('toggle-indent-guides', s.indentGuides !== false);
+  const pzs = document.getElementById('preview-zoom-slider');
+  if (pzs) { pzs.value = s.previewZoom || 100; document.getElementById('preview-zoom-val').textContent = (s.previewZoom || 100) + '%'; }
+  updateToggle('toggle-reset-scroll', s.resetScrollOnRun !== false);
 }
 
 function updateToggle(id, val) {
@@ -3161,6 +3386,227 @@ function toggleConsoleCap(btn) {
   saveState();
 }
 
+function toggleSmartBeta(btn) {
+  btn.classList.toggle('on');
+  const on = btn.classList.contains('on');
+  state.settings.smartBeta = on;
+  document.getElementById('smart-beta-details').style.display = on ? 'block' : 'none';
+  saveState();
+  if (on) {
+    showToast('Smart Beta enabled ✦ Enhanced predictions active', 'success');
+    initSmartBeta();
+  } else {
+    showToast('Smart Beta disabled', 'warn');
+    destroySmartBeta();
+  }
+}
+
+// ═══════════════════════════════════════
+// SMART BETA — Enhanced Prediction Tooltip
+// ═══════════════════════════════════════
+let _sbTimer = null;
+let _sbTooltip = null;
+let _sbDisposable = null;
+
+const _sbSnippets = {
+  html: [
+    { trigger: '<div', detail: 'Block container', insert: '<div class="${1:name}">\n  $0\n</div>' },
+    { trigger: '<button', detail: 'Interactive button', insert: '<button class="${1:btn}" onclick="${2:handler}">\n  $0\n</button>' },
+    { trigger: '<input', detail: 'Form input field', insert: '<input type="${1|text,email,number,password,checkbox,radio|}" name="${2}" placeholder="${3}" />' },
+    { trigger: '<section', detail: 'Page section', insert: '<section id="${1:section}" class="${2:container}">\n  <h2>$3</h2>\n  $0\n</section>' },
+    { trigger: '<a', detail: 'Anchor / link', insert: '<a href="${1:#}" target="${2|_self,_blank|}">${3:Link text}</a>' },
+    { trigger: '<img', detail: 'Image element', insert: '<img src="${1:image.png}" alt="${2:description}" width="${3:300}" />' },
+    { trigger: '<ul', detail: 'Unordered list', insert: '<ul>\n  <li>$1</li>\n  <li>$2</li>\n</ul>' },
+    { trigger: '<form', detail: 'HTML form', insert: '<form action="${1:#}" method="${2|get,post|}">\n  $0\n  <button type="submit">Submit</button>\n</form>' },
+  ],
+  css: [
+    { trigger: 'flex', detail: 'Flexbox container', insert: 'display: flex;\nalign-items: ${1|center,flex-start,flex-end,stretch|};\njustify-content: ${2|space-between,center,flex-start,flex-end|};' },
+    { trigger: 'grid', detail: 'CSS Grid container', insert: 'display: grid;\ngrid-template-columns: ${1:repeat(3, 1fr)};\ngap: ${2:16px};' },
+    { trigger: 'anim', detail: 'CSS Animation', insert: 'animation: ${1:name} ${2:0.3s} ${3|ease,ease-in,ease-out,ease-in-out,linear|} ${4:infinite};' },
+    { trigger: 'grad', detail: 'Linear gradient', insert: 'background: linear-gradient(${1:135deg}, ${2:#6366f1}, ${3:#a78bfa});' },
+    { trigger: 'shadow', detail: 'Box shadow', insert: 'box-shadow: ${1:0} ${2:4px} ${3:24px} ${4:rgba(0,0,0,0.3)};' },
+    { trigger: 'trans', detail: 'Transition', insert: 'transition: ${1:all} ${2:0.2s} ${3|ease,ease-in,ease-out,linear|};' },
+    { trigger: ':root', detail: 'CSS Variables', insert: ':root {\n  --${1:color}: ${2:#6366f1};\n  --${3:spacing}: ${4:16px};\n}' },
+  ],
+  javascript: [
+    { trigger: 'fetch', detail: 'Fetch API call', insert: 'const res = await fetch(\'${1:url}\');\nconst data = await res.json();\n$0' },
+    { trigger: 'addEventListener', detail: 'Event listener', insert: 'document.addEventListener(\'${1|click,keydown,scroll,load|}\', (${2:e}) => {\n  $0\n});' },
+    { trigger: 'querySelector', detail: 'DOM selector', insert: 'document.querySelector(\'${1:.selector}\')' },
+    { trigger: 'const', detail: 'Const declaration', insert: 'const ${1:name} = ${2:value};' },
+    { trigger: 'arrow', detail: 'Arrow function', insert: 'const ${1:fn} = (${2:params}) => {\n  $0\n};' },
+    { trigger: 'async', detail: 'Async function', insert: 'async function ${1:name}(${2:params}) {\n  try {\n    $0\n  } catch (err) {\n    console.error(err);\n  }\n}' },
+    { trigger: 'class', detail: 'ES6 Class', insert: 'class ${1:Name} {\n  constructor(${2:params}) {\n    $0\n  }\n}' },
+    { trigger: 'import', detail: 'ES Module import', insert: 'import { ${1:module} } from \'${2:package}\';' },
+  ]
+};
+
+function _sbGetLang() {
+  if (!editor) return 'html';
+  const model = editor.getModel();
+  return model ? model.getLanguageId() : 'html';
+}
+
+function _sbGetContext() {
+  if (!editor) return { line: '', word: '', lang: 'html', fullText: '' };
+  const pos = editor.getPosition();
+  const model = editor.getModel();
+  const lang = _sbGetLang();
+  const line = model.getLineContent(pos.lineNumber);
+  const word = model.getWordAtPosition(pos)?.word || '';
+  const startLine = Math.max(1, pos.lineNumber - 8);
+  const endLine = Math.min(model.getLineCount(), pos.lineNumber + 2);
+  let context = '';
+  for (let i = startLine; i <= endLine; i++) context += model.getLineContent(i) + '\n';
+  return { line: line.slice(0, pos.column - 1), word, lang, context, pos };
+}
+
+function _sbGetSuggestions(ctx) {
+  const snippets = _sbSnippets[ctx.lang] || _sbSnippets['javascript'];
+  const lineLC = ctx.line.toLowerCase();
+  const wordLC = ctx.word.toLowerCase();
+  const matches = snippets.filter(s =>
+    s.trigger.toLowerCase().includes(wordLC) ||
+    lineLC.endsWith(s.trigger.toLowerCase().slice(0, Math.max(2, wordLC.length)))
+  ).slice(0, 4);
+  if (!matches.length && ctx.word.length >= 2) {
+    const allSnippets = Object.values(_sbSnippets).flat();
+    return allSnippets.filter(s => s.trigger.toLowerCase().includes(wordLC)).slice(0, 3);
+  }
+  return matches;
+}
+
+function _sbShowTooltip(suggestions, pos) {
+  _sbHideTooltip();
+  if (!suggestions.length || !editor) return;
+  const editorDom = document.getElementById('editor-container');
+  if (!editorDom) return;
+  const layoutInfo = editor.getLayoutInfo();
+  const scrolledVisiblePosition = editor.getScrolledVisiblePosition(pos);
+  if (!scrolledVisiblePosition) return;
+  const editorRect = editorDom.getBoundingClientRect();
+  const x = editorRect.left + scrolledVisiblePosition.left;
+  const y = editorRect.top + scrolledVisiblePosition.top;
+
+  _sbTooltip = document.createElement('div');
+  _sbTooltip.id = 'sb-tooltip';
+  _sbTooltip.style.cssText = `
+    position:fixed;
+    left:${Math.min(x, window.innerWidth - 280)}px;
+    top:${y + 22}px;
+    z-index:9999;
+    background:var(--panel);
+    border-radius:9px;
+    padding:3px;
+    box-shadow:0 8px 36px rgba(0,0,0,.55);
+    min-width:240px;
+    max-width:320px;
+    pointer-events:none;
+    animation:sbFadeIn .15s ease;
+    background:linear-gradient(var(--panel),var(--panel)) padding-box,
+               linear-gradient(135deg,#6366f1,#a78bfa,#f43f5e,#f59e0b,#22c55e,#6366f1) border-box;
+    background-size:300% 300%;
+    border:1.5px solid transparent;
+    animation:sbFadeIn .15s ease, sbGradSpin 3s linear infinite;
+  `;
+  const inner = document.createElement('div');
+  inner.style.cssText = 'background:var(--panel);border-radius:7px;overflow:hidden;';
+  const header = document.createElement('div');
+  header.style.cssText = 'padding:5px 10px 4px;display:flex;align-items:center;gap:5px;border-bottom:1px solid var(--border)';
+  header.innerHTML = `<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;background:linear-gradient(90deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent">✦ Smart Beta</span><span style="font-size:9px;color:var(--text-faint);margin-left:auto">${suggestions.length} suggestion${suggestions.length>1?'s':''}</span>`;
+  inner.appendChild(header);
+  suggestions.forEach((s, i) => {
+    const row = document.createElement('div');
+    row.style.cssText = `padding:6px 10px;display:flex;align-items:center;gap:8px;${i < suggestions.length-1 ? 'border-bottom:1px solid var(--border)' : ''}`;
+    row.innerHTML = `<span style="font-family:var(--font-mono);font-size:11px;color:var(--accent2);flex-shrink:0">${s.trigger}</span><span style="font-size:10px;color:var(--text-dim);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.detail}</span>`;
+    inner.appendChild(row);
+  });
+  _sbTooltip.appendChild(inner);
+  document.body.appendChild(_sbTooltip);
+}
+
+function _sbHideTooltip() {
+  if (_sbTooltip) { _sbTooltip.remove(); _sbTooltip = null; }
+}
+
+function initSmartBeta() {
+  if (!editor) return;
+  _sbDisposable = editor.onDidChangeCursorPosition(() => {
+    if (!state.settings.smartBeta) return;
+    clearTimeout(_sbTimer);
+    _sbHideTooltip();
+    _sbTimer = setTimeout(() => {
+      const ctx = _sbGetContext();
+      if (ctx.word.length < 2 && ctx.line.trim().length < 2) return;
+      const suggestions = _sbGetSuggestions(ctx);
+      if (suggestions.length) _sbShowTooltip(suggestions, ctx.pos);
+    }, 420);
+  });
+  editor.onDidChangeModelContent(() => {
+    if (!state.settings.smartBeta) return;
+    clearTimeout(_sbTimer);
+    _sbHideTooltip();
+    _sbTimer = setTimeout(() => {
+      const ctx = _sbGetContext();
+      if (ctx.word.length < 2 && ctx.line.trim().length < 2) return;
+      const suggestions = _sbGetSuggestions(ctx);
+      if (suggestions.length) _sbShowTooltip(suggestions, ctx.pos);
+    }, 500);
+  });
+}
+
+function destroySmartBeta() {
+  clearTimeout(_sbTimer);
+  _sbHideTooltip();
+  if (_sbDisposable) { _sbDisposable.dispose(); _sbDisposable = null; }
+}
+
+function changeCursorStyle(v) {
+  state.settings.cursorStyle = v;
+  if (editor) editor.updateOptions({ cursorStyle: v });
+  saveState();
+}
+
+function toggleLigatures(btn) {
+  btn.classList.toggle('on');
+  const on = btn.classList.contains('on');
+  state.settings.ligatures = on;
+  if (editor) editor.updateOptions({ fontLigatures: on });
+  saveState();
+}
+
+function toggleSmoothScroll(btn) {
+  btn.classList.toggle('on');
+  const on = btn.classList.contains('on');
+  state.settings.smoothScroll = on;
+  if (editor) editor.updateOptions({ smoothScrolling: on });
+  saveState();
+}
+
+function toggleIndentGuides(btn) {
+  btn.classList.toggle('on');
+  const on = btn.classList.contains('on');
+  state.settings.indentGuides = on;
+  if (editor) editor.updateOptions({ guides: { indentation: on, bracketPairs: on } });
+  saveState();
+}
+
+function changePreviewZoom(v) {
+  state.settings.previewZoom = parseInt(v);
+  document.getElementById('preview-zoom-val').textContent = v + '%';
+  const frame = document.getElementById('preview-frame');
+  if (frame) frame.style.transform = `scale(${v/100})`;
+  if (frame) frame.style.transformOrigin = 'top left';
+  if (frame) frame.style.width = (10000/v) + '%';
+  if (frame) frame.style.height = (10000/v) + '%';
+  saveState();
+}
+
+function toggleResetScroll(btn) {
+  btn.classList.toggle('on');
+  state.settings.resetScrollOnRun = btn.classList.contains('on');
+  saveState();
+}
+
 function updateAutoRunBtn() {
   const btn = document.getElementById('autorun-btn');
   if (btn) {
@@ -3200,6 +3646,567 @@ function formatCode() {
   if (!editor) return;
   editor.getAction('editor.action.formatDocument')?.run();
   showToast('Code formatted', 'success');
+}
+
+let _smartFindActive = false;
+let _smartFindDecorations = [];
+
+function toggleSmartFind() {
+  _smartFindActive = !_smartFindActive;
+  const btn = document.getElementById('smart-find-btn');
+  const toolbar = document.querySelector('.toolbar');
+  if (_smartFindActive) {
+    btn.classList.add('btn-primary');
+    btn.title = 'Smart Find ON — click to disable';
+    if (toolbar) {
+      toolbar.style.setProperty('--sf-anim', '1');
+      toolbar.setAttribute('data-smartfind', 'on');
+    }
+    openSmartFind();
+  } else {
+    btn.classList.remove('btn-primary');
+    btn.title = 'Smart Find Mode';
+    if (toolbar) toolbar.removeAttribute('data-smartfind');
+    if (_smartFindDecorations.length && editor) {
+      _smartFindDecorations = editor.deltaDecorations(_smartFindDecorations, []);
+    }
+    editor?.getAction('actions.find')?.run();
+  }
+}
+
+function openSmartFind() {
+  if (!editor) return;
+  const existing = document.getElementById('smart-find-overlay');
+  if (existing) { existing.remove(); }
+  const overlay = document.createElement('div');
+  overlay.id = 'smart-find-overlay';
+  overlay.innerHTML = `
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+      <span style="font-size:10px;font-weight:700;color:var(--accent2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap"><i class="fas fa-brain" style="margin-right:4px"></i>Smart Find</span>
+      <input id="sf-input" placeholder="Search anything — ignores whitespace, case, format…" autocomplete="off"
+        style="flex:1;min-width:180px;background:var(--panel);border:1px solid var(--border-bright);border-radius:5px;color:var(--text);font-family:var(--font-mono);font-size:12px;padding:4px 10px;outline:none;height:28px" />
+      <span id="sf-count" style="font-size:10px;color:var(--text-dim);white-space:nowrap;min-width:54px"></span>
+      <button onclick="sfNavigate(-1)" class="btn btn-ghost" style="height:24px;padding:0 8px;font-size:11px" title="Previous (Shift+Enter)"><i class="fas fa-chevron-up"></i></button>
+      <button onclick="sfNavigate(1)" class="btn btn-ghost" style="height:24px;padding:0 8px;font-size:11px" title="Next (Enter)"><i class="fas fa-chevron-down"></i></button>
+      <button onclick="sfClear()" class="btn btn-ghost" style="height:24px;padding:0 8px;font-size:11px" title="Close"><i class="fas fa-times"></i></button>
+    </div>`;
+  overlay.style.cssText = 'position:absolute;bottom:0;left:0;right:0;z-index:200;padding:7px 12px;background:var(--panel2);border-top:1px solid var(--border-bright);box-shadow:0 -4px 18px rgba(0,0,0,.35);';
+  const editorArea = document.querySelector('.editor-area');
+  if (editorArea) editorArea.appendChild(overlay);
+  const input = document.getElementById('sf-input');
+  if (input) {
+    input.focus();
+    input.addEventListener('input', sfRun);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); sfNavigate(e.shiftKey ? -1 : 1); }
+      if (e.key === 'Escape') { e.preventDefault(); sfClear(); }
+    });
+  }
+}
+
+let _sfMatches = [], _sfCursor = -1;
+
+function _sfNormalize(str) {
+  return str.replace(/\s+/g, ' ').trim().toLowerCase()
+    .replace(/['']/g, "'").replace(/[""]/g, '"')
+    .replace(/[–—]/g, '-').replace(/\u00a0/g, ' ');
+}
+
+function sfRun() {
+  if (!editor) return;
+  const raw = document.getElementById('sf-input')?.value || '';
+  _sfMatches = [];
+  _sfCursor = -1;
+  _smartFindDecorations = editor.deltaDecorations(_smartFindDecorations, []);
+  document.getElementById('sf-count').textContent = '';
+  if (!raw.trim()) return;
+  const model = editor.getModel();
+  if (!model) return;
+  const needle = _sfNormalize(raw);
+  const fullText = model.getValue();
+  const normalFull = _sfNormalize(fullText);
+  let idx = 0;
+  while (true) {
+    const pos = normalFull.indexOf(needle, idx);
+    if (pos === -1) break;
+    const startPos = model.getPositionAt(pos);
+    const endPos = model.getPositionAt(pos + needle.length);
+    _sfMatches.push({ startLineNumber: startPos.lineNumber, startColumn: startPos.column, endLineNumber: endPos.lineNumber, endColumn: endPos.column });
+    idx = pos + 1;
+  }
+  _smartFindDecorations = editor.deltaDecorations(_smartFindDecorations, _sfMatches.map((r, i) => ({
+    range: r,
+    options: { className: i === 0 ? 'sf-match-current' : 'sf-match', inlineClassName: i === 0 ? 'sf-match-current' : 'sf-match' }
+  })));
+  const cnt = document.getElementById('sf-count');
+  if (cnt) cnt.textContent = _sfMatches.length > 0 ? `${_sfMatches.length} found` : '0 found';
+  if (_sfMatches.length > 0) { _sfCursor = 0; sfFocus(0); }
+}
+
+function sfNavigate(dir) {
+  if (!_sfMatches.length) return;
+  _sfCursor = (_sfCursor + dir + _sfMatches.length) % _sfMatches.length;
+  sfFocus(_sfCursor);
+}
+
+function sfFocus(i) {
+  if (!editor || !_sfMatches[i]) return;
+  const r = _sfMatches[i];
+  editor.revealRangeInCenter(r);
+  editor.setSelection(r);
+  _smartFindDecorations = editor.deltaDecorations(_smartFindDecorations, _sfMatches.map((m, j) => ({
+    range: m,
+    options: { className: j === i ? 'sf-match-current' : 'sf-match', inlineClassName: j === i ? 'sf-match-current' : 'sf-match' }
+  })));
+  const cnt = document.getElementById('sf-count');
+  if (cnt) cnt.textContent = `${i + 1} / ${_sfMatches.length}`;
+}
+
+function sfClear() {
+  if (editor && _smartFindDecorations.length) _smartFindDecorations = editor.deltaDecorations(_smartFindDecorations, []);
+  _sfMatches = []; _sfCursor = -1;
+  document.getElementById('smart-find-overlay')?.remove();
+  _smartFindActive = false;
+  const btn = document.getElementById('smart-find-btn');
+  if (btn) { btn.classList.remove('btn-primary'); btn.title = 'Smart Find Mode'; }
+  document.querySelector('.toolbar')?.removeAttribute('data-smartfind');
+}
+
+// ═══════════════════════════════════════
+// TOOLBOX
+// ═══════════════════════════════════════
+function toggleToolbox() {
+  const menu = document.getElementById('toolbox-menu');
+  const btn = document.getElementById('toolbox-btn');
+  if (!menu || !btn) return;
+  const open = menu.style.display !== 'none';
+  if (open) {
+    menu.style.display = 'none';
+    btn.classList.remove('btn-primary');
+    return;
+  }
+  const rect = btn.getBoundingClientRect();
+  menu.style.display = 'block';
+  menu.style.top = (rect.bottom + 6) + 'px';
+  menu.style.right = (window.innerWidth - rect.right) + 'px';
+  menu.style.left = 'auto';
+  btn.classList.add('btn-primary');
+  const close = e => {
+    if (!btn.contains(e.target) && !menu.contains(e.target)) {
+      menu.style.display = 'none';
+      btn.classList.remove('btn-primary');
+      document.removeEventListener('mousedown', close);
+    }
+  };
+  setTimeout(() => document.addEventListener('mousedown', close), 10);
+}
+
+function _tbxModal(title, icon, bodyHtml, width) {
+  document.getElementById('tbx-modal-overlay')?.remove();
+  const ov = document.createElement('div');
+  ov.id = 'tbx-modal-overlay';
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:900;display:flex;align-items:center;justify-content:center';
+  ov.innerHTML = `<div style="background:var(--panel);border:1px solid var(--border-bright);border-radius:10px;width:min(${width||480}px,95vw);max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.6);overflow:hidden">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <i class="fas ${icon}" style="color:var(--accent)"></i>
+      <span style="font-size:13px;font-weight:600">${title}</span>
+      <button onclick="document.getElementById('tbx-modal-overlay').remove()" style="margin-left:auto;background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:13px;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:4px"><i class="fas fa-times"></i></button>
+    </div>
+    <div style="padding:16px;overflow-y:auto;flex:1">${bodyHtml}</div>
+  </div>`;
+  document.body.appendChild(ov);
+  document.getElementById('toolbox-menu').style.display = 'none';
+  document.getElementById('toolbox-btn').classList.remove('btn-primary');
+}
+
+function tbxColourWheel() {
+  _tbxModal('Colour Wheel', 'fa-palette', `
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <canvas id="tbx-cw-canvas" width="220" height="220" style="border-radius:50%;cursor:crosshair;box-shadow:0 0 24px rgba(0,0,0,.4)"></canvas>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div id="tbx-cw-swatch" style="width:44px;height:44px;border-radius:8px;border:2px solid var(--border-bright);background:#ff0000"></div>
+        <div>
+          <div id="tbx-cw-hex" style="font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--text)">#FF0000</div>
+          <div id="tbx-cw-rgb" style="font-size:11px;color:var(--text-dim)">rgb(255, 0, 0)</div>
+        </div>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-cw-hex').textContent);showToast('Copied!','success')" class="btn btn-subtle" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i> Copy</button>
+      </div>
+      <input type="range" id="tbx-cw-bright" min="0" max="100" value="100" style="width:200px;accent-color:var(--accent)">
+      <div style="font-size:10px;color:var(--text-dim)">Drag on wheel · slider = brightness</div>
+    </div>`, 360);
+  requestAnimationFrame(() => {
+    const c = document.getElementById('tbx-cw-canvas');
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    const cx = 110, cy = 110, r = 108;
+    function drawWheel(bright) {
+      for (let a = 0; a < 360; a++) {
+        const g = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+        g.addColorStop(0, `hsl(${a},0%,${bright}%)`);
+        g.addColorStop(1, `hsl(${a},100%,${bright/2}%)`);
+        ctx.beginPath(); ctx.moveTo(cx,cy);
+        ctx.arc(cx,cy,r,(a-1)*Math.PI/180,a*Math.PI/180);
+        ctx.fillStyle = g; ctx.fill();
+      }
+    }
+    drawWheel(100);
+    function pick(e) {
+      const rect = c.getBoundingClientRect();
+      const x = (e.clientX??e.touches[0].clientX) - rect.left, y = (e.clientY??e.touches[0].clientY) - rect.top;
+      const px = Math.round(x*(c.width/rect.width)), py = Math.round(y*(c.height/rect.height));
+      const d = ctx.getImageData(px,py,1,1).data;
+      const hex = '#'+[d[0],d[1],d[2]].map(v=>v.toString(16).padStart(2,'0')).join('').toUpperCase();
+      document.getElementById('tbx-cw-swatch').style.background = hex;
+      document.getElementById('tbx-cw-hex').textContent = hex;
+      document.getElementById('tbx-cw-rgb').textContent = `rgb(${d[0]}, ${d[1]}, ${d[2]})`;
+    }
+    let down=false;
+    c.onmousedown = e=>{down=true;pick(e);}; c.onmousemove = e=>{if(down)pick(e);}; c.onmouseup=()=>down=false;
+    c.ontouchstart=pick; c.ontouchmove=pick;
+    document.getElementById('tbx-cw-bright').oninput = function(){ drawWheel(+this.value); };
+  });
+}
+
+function tbxContrastChecker() {
+  _tbxModal('Contrast Checker', 'fa-adjust', `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:12px">
+        <label style="flex:1;font-size:11px;color:var(--text-dim)">Foreground<br><div style="display:flex;gap:6px;margin-top:4px"><input type="color" id="tbx-cc-fg" value="#ffffff" style="width:36px;height:28px;border:none;border-radius:4px;cursor:pointer"><input id="tbx-cc-fgtxt" value="#FFFFFF" style="flex:1;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-family:var(--font-mono);font-size:12px" oninput="document.getElementById('tbx-cc-fg').value=this.value;tbxCCCalc()"></div></label>
+        <label style="flex:1;font-size:11px;color:var(--text-dim)">Background<br><div style="display:flex;gap:6px;margin-top:4px"><input type="color" id="tbx-cc-bg" value="#000000" style="width:36px;height:28px;border:none;border-radius:4px;cursor:pointer"><input id="tbx-cc-bgtxt" value="#000000" style="flex:1;background:var(--panel2);border:1px solid var(--panel2);color:var(--text);border-radius:5px;padding:4px 8px;font-family:var(--font-mono);font-size:12px" oninput="document.getElementById('tbx-cc-bg').value=this.value;tbxCCCalc()"></div></label>
+      </div>
+      <div id="tbx-cc-preview" style="border-radius:8px;padding:14px 16px;text-align:center;font-size:16px;font-weight:600;background:#000;color:#fff;border:1px solid var(--border)">Sample Text</div>
+      <div id="tbx-cc-result" style="background:var(--panel2);border-radius:8px;padding:12px 14px;font-size:12px;line-height:2"></div>
+    </div>`);
+  setTimeout(() => {
+    const fgEl=document.getElementById('tbx-cc-fg'), bgEl=document.getElementById('tbx-cc-bg');
+    fgEl.oninput=()=>{document.getElementById('tbx-cc-fgtxt').value=fgEl.value.toUpperCase();tbxCCCalc();};
+    bgEl.oninput=()=>{document.getElementById('tbx-cc-bgtxt').value=bgEl.value.toUpperCase();tbxCCCalc();};
+    tbxCCCalc();
+  }, 50);
+}
+function tbxCCCalc() {
+  const fg=document.getElementById('tbx-cc-fg')?.value||'#fff', bg=document.getElementById('tbx-cc-bg')?.value||'#000';
+  const lum=h=>{const r=parseInt(h.slice(1,3),16)/255,g=parseInt(h.slice(3,5),16)/255,b=parseInt(h.slice(5,7),16)/255;return 0.2126*sRGB(r)+0.7152*sRGB(g)+0.0722*sRGB(b);};
+  const sRGB=v=>v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);
+  const L1=lum(fg),L2=lum(bg),ratio=((Math.max(L1,L2)+0.05)/(Math.min(L1,L2)+0.05));
+  const r=ratio.toFixed(2);
+  const aa=ratio>=4.5, aaa=ratio>=7, aaLg=ratio>=3;
+  document.getElementById('tbx-cc-preview').style.cssText=`border-radius:8px;padding:14px 16px;text-align:center;font-size:16px;font-weight:600;background:${bg};color:${fg};border:1px solid var(--border)`;
+  document.getElementById('tbx-cc-result').innerHTML=`<b style="font-size:15px;color:var(--text)">${r}:1</b> contrast ratio<br>
+    AA Normal: <b style="color:${aa?'var(--success)':'var(--danger)'}">${aa?'Pass ✓':'Fail ✗'}</b> &nbsp; AA Large: <b style="color:${aaLg?'var(--success)':'var(--danger)'}">${aaLg?'Pass ✓':'Fail ✗'}</b> &nbsp; AAA: <b style="color:${aaa?'var(--success)':'var(--danger)'}">${aaa?'Pass ✓':'Fail ✗'}</b>`;
+}
+
+function tbxBase64() {
+  _tbxModal('Base64 Encode / Decode', 'fa-code', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <textarea id="tbx-b64-in" rows="4" placeholder="Input text or Base64…" style="width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none"></textarea>
+      <div style="display:flex;gap:8px">
+        <button onclick="tbxB64Go('enc')" class="btn btn-primary" style="height:28px;padding:0 12px;font-size:11px"><i class="fas fa-lock"></i> Encode</button>
+        <button onclick="tbxB64Go('dec')" class="btn btn-subtle" style="height:28px;padding:0 12px;font-size:11px"><i class="fas fa-lock-open"></i> Decode</button>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-b64-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;margin-left:auto"><i class="fas fa-copy"></i></button>
+      </div>
+      <textarea id="tbx-b64-out" rows="4" readonly placeholder="Result…" style="width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none"></textarea>
+    </div>`);
+}
+function tbxB64Go(mode) {
+  const v=document.getElementById('tbx-b64-in')?.value||'';
+  try { document.getElementById('tbx-b64-out').value = mode==='enc' ? btoa(unescape(encodeURIComponent(v))) : decodeURIComponent(escape(atob(v))); }
+  catch(e) { document.getElementById('tbx-b64-out').value = 'Error: '+e.message; }
+}
+
+function tbxRegexTester() {
+  _tbxModal('Regex Tester', 'fa-terminal', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="color:var(--text-dim);font-family:var(--font-mono)">/</span>
+        <input id="tbx-rx-pat" placeholder="pattern" style="flex:1;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-family:var(--font-mono);font-size:13px;outline:none" oninput="tbxRxRun()">
+        <span style="color:var(--text-dim);font-family:var(--font-mono)">/</span>
+        <input id="tbx-rx-flags" value="gi" placeholder="flags" style="width:50px;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 6px;font-family:var(--font-mono);font-size:13px;outline:none" oninput="tbxRxRun()">
+      </div>
+      <textarea id="tbx-rx-test" rows="5" placeholder="Test string…" style="width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none" oninput="tbxRxRun()"></textarea>
+      <div id="tbx-rx-out" style="background:var(--panel2);border-radius:6px;padding:10px 12px;font-size:12px;font-family:var(--font-mono);min-height:40px;color:var(--text-dim)">Matches will appear here</div>
+    </div>`, 500);
+}
+function tbxRxRun() {
+  const pat=document.getElementById('tbx-rx-pat')?.value, flags=document.getElementById('tbx-rx-flags')?.value||'g', str=document.getElementById('tbx-rx-test')?.value||'';
+  const out=document.getElementById('tbx-rx-out'); if(!out)return;
+  if(!pat){out.textContent='Matches will appear here';return;}
+  try {
+    const re=new RegExp(pat,flags); const matches=[...str.matchAll(new RegExp(pat,flags.includes('g')?flags:flags+'g'))];
+    out.innerHTML=matches.length?`<span style="color:var(--success)">${matches.length} match${matches.length>1?'es':''}</span><br>`+matches.map((m,i)=>`<span style="color:var(--accent2)">[${i}]</span> <b style="color:var(--text)">${m[0].replace(/</g,'&lt;')}</b> <span style="color:var(--text-dim)">at index ${m.index}</span>`).join('<br>'):`<span style="color:var(--danger)">No matches</span>`;
+  } catch(e){out.innerHTML=`<span style="color:var(--danger)">Error: ${e.message}</span>`;}
+}
+
+function tbxJsonFormatter() {
+  _tbxModal('JSON Formatter', 'fa-code', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <textarea id="tbx-json-in" rows="6" placeholder="Paste JSON here…" style="width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none"></textarea>
+      <div style="display:flex;gap:8px">
+        <button onclick="tbxJsonGo('fmt')" class="btn btn-primary" style="height:28px;padding:0 12px;font-size:11px">Format</button>
+        <button onclick="tbxJsonGo('min')" class="btn btn-subtle" style="height:28px;padding:0 12px;font-size:11px">Minify</button>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-json-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;margin-left:auto"><i class="fas fa-copy"></i></button>
+      </div>
+      <textarea id="tbx-json-out" rows="6" readonly style="width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none"></textarea>
+    </div>`, 520);
+}
+function tbxJsonGo(mode) {
+  try { const j=JSON.parse(document.getElementById('tbx-json-in').value); document.getElementById('tbx-json-out').value=mode==='fmt'?JSON.stringify(j,null,2):JSON.stringify(j); }
+  catch(e){document.getElementById('tbx-json-out').value='Error: '+e.message;}
+}
+
+function tbxUnitConverter() {
+  _tbxModal('CSS Unit Converter', 'fa-ruler-combined', `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:8px;align-items:flex-end">
+        <label style="flex:1;font-size:11px;color:var(--text-dim)">Value<input id="tbx-uc-val" type="number" value="16" style="display:block;width:100%;margin-top:4px;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:6px 8px;font-family:var(--font-mono);font-size:13px;outline:none" oninput="tbxUCCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim)">From<select id="tbx-uc-from" style="display:block;margin-top:4px;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:6px 8px;outline:none" onchange="tbxUCCalc()"><option>px</option><option>rem</option><option>em</option><option>pt</option><option>vw</option><option>%</option></select></label>
+        <span style="margin-bottom:8px;color:var(--text-dim)">→</span>
+        <label style="font-size:11px;color:var(--text-dim)">To<select id="tbx-uc-to" style="display:block;margin-top:4px;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:6px 8px;outline:none" onchange="tbxUCCalc()"><option>rem</option><option>px</option><option>em</option><option>pt</option><option>vw</option><option>%</option></select></label>
+      </div>
+      <div id="tbx-uc-res" style="background:var(--panel2);border-radius:8px;padding:14px;text-align:center;font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--accent2)">—</div>
+      <div style="font-size:10px;color:var(--text-faint);text-align:center">Base font size: 16px assumed for rem/em conversions</div>
+    </div>`);
+  setTimeout(tbxUCCalc, 50);
+}
+function tbxUCCalc() {
+  const v=parseFloat(document.getElementById('tbx-uc-val')?.value)||0, fr=document.getElementById('tbx-uc-from')?.value, to=document.getElementById('tbx-uc-to')?.value, base=16, vw=window.innerWidth;
+  const toPx={px:v,rem:v*base,em:v*base,pt:v*1.333,vw:v*vw/100,'%':v*base/100};
+  const fromPx={px:v=>v,rem:v=>v/base,em:v=>v/base,pt:v=>v/1.333,vw:v=>v/(window.innerWidth/100),'%':v=>v/base*100};
+  const res=fromPx[to](toPx[fr]||0);
+  const out=document.getElementById('tbx-uc-res'); if(out) out.textContent=`${res.toFixed(4).replace(/\.?0+$/,'')} ${to}`;
+}
+
+function tbxLineCounter() {
+  const code = editor?.getValue()||'';
+  const lines=code.split('\n').length, words=code.trim().split(/\s+/).filter(Boolean).length, chars=code.length;
+  _tbxModal('Line / Word Count', 'fa-list-ol', `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
+      <div style="background:var(--panel2);border-radius:8px;padding:16px 10px"><div style="font-size:26px;font-weight:700;color:var(--accent)">${lines.toLocaleString()}</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">Lines</div></div>
+      <div style="background:var(--panel2);border-radius:8px;padding:16px 10px"><div style="font-size:26px;font-weight:700;color:var(--accent2)">${words.toLocaleString()}</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">Words</div></div>
+      <div style="background:var(--panel2);border-radius:8px;padding:16px 10px"><div style="font-size:26px;font-weight:700;color:var(--success)">${chars.toLocaleString()}</div><div style="font-size:11px;color:var(--text-dim);margin-top:4px">Characters</div></div>
+    </div>`, 380);
+}
+
+function tbxTimestamp() {
+  const now=new Date();
+  _tbxModal('Timestamp Generator', 'fa-clock', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      ${[['Unix (s)',Math.floor(now/1000)],['Unix (ms)',now.getTime()],['ISO 8601',now.toISOString()],['UTC',now.toUTCString()],['Local',now.toLocaleString()]].map(([l,v])=>`
+      <div style="display:flex;align-items:center;gap:8px;background:var(--panel2);border-radius:6px;padding:8px 10px">
+        <span style="font-size:10px;color:var(--text-dim);width:80px;flex-shrink:0">${l}</span>
+        <code style="flex:1;font-family:var(--font-mono);font-size:12px;color:var(--text)">${v}</code>
+        <button onclick="navigator.clipboard.writeText('${v}');showToast('Copied!','success')" class="btn btn-ghost" style="height:22px;padding:0 8px;font-size:10px"><i class="fas fa-copy"></i></button>
+      </div>`).join('')}
+    </div>`, 480);
+}
+
+function tbxMinifier() {
+  _tbxModal('CSS / JS Minifier', 'fa-compress-alt', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-size:11px;color:var(--text-dim)">Type:</span>
+        <select id="tbx-min-type" style="background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:11px;outline:none">
+          <option value="css">CSS</option>
+          <option value="js">JavaScript</option>
+        </select>
+        <button onclick="tbxMinGo()" class="btn btn-primary" style="height:28px;padding:0 12px;font-size:11px"><i class="fas fa-compress-alt"></i> Minify</button>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-min-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;margin-left:auto"><i class="fas fa-copy"></i></button>
+      </div>
+      <textarea id="tbx-min-in" rows="6" placeholder="Paste CSS or JS here…" style="width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none"></textarea>
+      <textarea id="tbx-min-out" rows="4" readonly placeholder="Minified output…" style="width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none"></textarea>
+      <div id="tbx-min-stats" style="font-size:10px;color:var(--text-dim)"></div>
+    </div>`, 520);
+}
+function tbxMinGo() {
+  const inp = document.getElementById('tbx-min-in')?.value || '';
+  const type = document.getElementById('tbx-min-type')?.value;
+  let out = inp;
+  if (type === 'css') {
+    out = inp
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\s*([{};:,>~+])\s*/g, '$1')
+      .replace(/\s+/g, ' ')
+      .replace(/;\}/g, '}')
+      .trim();
+  } else {
+    out = inp
+      .replace(/\/\/[^\n]*/g, '')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\s*([=+\-*/%&|^!<>?:,;{}()[\]])\s*/g, '$1')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  document.getElementById('tbx-min-out').value = out;
+  const saved = inp.length - out.length;
+  const pct = inp.length ? ((saved / inp.length) * 100).toFixed(1) : 0;
+  document.getElementById('tbx-min-stats').textContent = inp.length
+    ? `${inp.length} → ${out.length} chars · saved ${saved} (${pct}%)`
+    : '';
+}
+
+function tbxShadowBuilder() {
+  _tbxModal('Box Shadow Builder', 'fa-clone', `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${[['Offset X','sbx','-50','50','0'],['Offset Y','sby','-50','50','4'],['Blur','sbb','0','80','16'],['Spread','sbs','-20','40','0']].map(([l,id,mn,mx,v])=>`
+        <label style="font-size:11px;color:var(--text-dim)">${l} <span id="${id}-val" style="color:var(--accent2)">${v}px</span>
+          <input type="range" id="${id}" min="${mn}" max="${mx}" value="${v}" style="display:block;width:100%;margin-top:4px;accent-color:var(--accent)" oninput="tbxSBCalc()"></label>`).join('')}
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <label style="font-size:11px;color:var(--text-dim)">Colour
+          <input type="color" id="sbc" value="#000000" style="display:block;margin-top:4px;width:48px;height:28px;border:none;border-radius:4px;cursor:pointer" oninput="tbxSBCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Opacity <span id="sbo-val" style="color:var(--accent2)">40%</span>
+          <input type="range" id="sbo" min="0" max="100" value="40" style="display:block;width:100%;margin-top:4px;accent-color:var(--accent)" oninput="tbxSBCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:6px;margin-top:14px">
+          <input type="checkbox" id="sb-inset" oninput="tbxSBCalc()"> Inset</label>
+      </div>
+      <div id="sb-preview" style="height:80px;background:var(--panel2);border-radius:8px;display:flex;align-items:center;justify-content:center">
+        <div id="sb-preview-box" style="width:80px;height:50px;background:var(--accent);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,0.4)"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <code id="sb-output" style="flex:1;font-family:var(--font-mono);font-size:11px;color:var(--text);background:var(--panel2);padding:8px 10px;border-radius:5px;word-break:break-all">box-shadow: 0 4px 16px rgba(0,0,0,0.4);</code>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('sb-output').textContent);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i></button>
+      </div>
+    </div>`, 480);
+  setTimeout(tbxSBCalc, 50);
+}
+function tbxSBCalc() {
+  const x=document.getElementById('sbx')?.value||0, y=document.getElementById('sby')?.value||4;
+  const b=document.getElementById('sbb')?.value||16, sp=document.getElementById('sbs')?.value||0;
+  const c=document.getElementById('sbc')?.value||'#000000', o=document.getElementById('sbo')?.value||40;
+  const inset=document.getElementById('sb-inset')?.checked;
+  document.getElementById('sbx-val').textContent=x+'px'; document.getElementById('sby-val').textContent=y+'px';
+  document.getElementById('sbb-val').textContent=b+'px'; document.getElementById('sbs-val').textContent=sp+'px';
+  document.getElementById('sbo-val').textContent=o+'%';
+  const r=parseInt(c.slice(1,3),16),g=parseInt(c.slice(3,5),16),bl=parseInt(c.slice(5,7),16);
+  const rgba=`rgba(${r},${g},${bl},${(o/100).toFixed(2)})`;
+  const val=`${inset?'inset ':''}${x}px ${y}px ${b}px ${sp}px ${rgba}`;
+  const css=`box-shadow: ${val};`;
+  document.getElementById('sb-output').textContent=css;
+  const box=document.getElementById('sb-preview-box');
+  if(box) box.style.boxShadow=val;
+}
+
+function tbxGradientBuilder() {
+  _tbxModal('Gradient Builder', 'fa-fill-drip', `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <label style="font-size:11px;color:var(--text-dim)">Type
+          <select id="gb-type" style="display:block;margin-top:4px;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;outline:none" onchange="tbxGBCalc()">
+            <option>linear</option><option>radial</option><option>conic</option>
+          </select></label>
+        <label style="font-size:11px;color:var(--text-dim)">Angle <span id="gb-angle-val" style="color:var(--accent2)">135°</span>
+          <input type="range" id="gb-angle" min="0" max="360" value="135" style="display:block;width:120px;margin-top:4px;accent-color:var(--accent)" oninput="tbxGBCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Stop 1
+          <input type="color" id="gb-c1" value="#6366f1" style="display:block;margin-top:4px;width:48px;height:28px;border:none;border-radius:4px;cursor:pointer" oninput="tbxGBCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Stop 2
+          <input type="color" id="gb-c2" value="#f43f5e" style="display:block;margin-top:4px;width:48px;height:28px;border:none;border-radius:4px;cursor:pointer" oninput="tbxGBCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Stop 3 (opt)
+          <input type="color" id="gb-c3" value="#f59e0b" style="display:block;margin-top:4px;width:48px;height:28px;border:none;border-radius:4px;cursor:pointer" oninput="tbxGBCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:6px;margin-top:14px">
+          <input type="checkbox" id="gb-c3-on" onchange="tbxGBCalc()"> 3rd stop</label>
+      </div>
+      <div id="gb-preview" style="height:80px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#f43f5e)"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <code id="gb-output" style="flex:1;font-family:var(--font-mono);font-size:11px;color:var(--text);background:var(--panel2);padding:8px 10px;border-radius:5px;word-break:break-all">background: linear-gradient(135deg, #6366f1, #f43f5e);</code>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('gb-output').textContent);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i></button>
+      </div>
+    </div>`, 500);
+  setTimeout(tbxGBCalc, 50);
+}
+function tbxGBCalc() {
+  const type=document.getElementById('gb-type')?.value||'linear';
+  const angle=document.getElementById('gb-angle')?.value||135;
+  const c1=document.getElementById('gb-c1')?.value||'#6366f1';
+  const c2=document.getElementById('gb-c2')?.value||'#f43f5e';
+  const c3=document.getElementById('gb-c3')?.value||'#f59e0b';
+  const use3=document.getElementById('gb-c3-on')?.checked;
+  document.getElementById('gb-angle-val').textContent=angle+'°';
+  const stops=use3?`${c1}, ${c2}, ${c3}`:`${c1}, ${c2}`;
+  let grad='';
+  if(type==='linear') grad=`linear-gradient(${angle}deg, ${stops})`;
+  else if(type==='radial') grad=`radial-gradient(circle, ${stops})`;
+  else grad=`conic-gradient(from ${angle}deg, ${stops})`;
+  const css=`background: ${grad};`;
+  document.getElementById('gb-output').textContent=css;
+  const prev=document.getElementById('gb-preview');
+  if(prev) prev.style.background=grad;
+}
+
+function tbxHtmlEntities() {
+  _tbxModal('HTML Entities', 'fa-exchange-alt', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:8px">
+        <button onclick="tbxEntGo('enc')" class="btn btn-primary" style="height:28px;padding:0 12px;font-size:11px"><i class="fas fa-lock"></i> Encode</button>
+        <button onclick="tbxEntGo('dec')" class="btn btn-subtle" style="height:28px;padding:0 12px;font-size:11px"><i class="fas fa-lock-open"></i> Decode</button>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-ent-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;margin-left:auto"><i class="fas fa-copy"></i></button>
+      </div>
+      <textarea id="tbx-ent-in" rows="5" placeholder="Input text or HTML entities…" style="width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none"></textarea>
+      <textarea id="tbx-ent-out" rows="5" readonly placeholder="Result…" style="width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:12px;resize:vertical;outline:none"></textarea>
+      <details style="font-size:10px;color:var(--text-dim)">
+        <summary style="cursor:pointer;color:var(--accent2)">Common entities reference</summary>
+        <div style="margin-top:6px;display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+          ${[['&amp;','&'],['&lt;','<'],['&gt;','>'],['&quot;','"'],['&apos;',"'"],['&nbsp;','space'],['&copy;','©'],['&reg;','®'],['&trade;','™'],['&euro;','€'],['&pound;','£'],['&mdash;','—']].map(([e,c])=>`<span style="background:var(--panel2);padding:3px 6px;border-radius:4px;font-family:var(--font-mono)">${e} <span style="color:var(--accent2)">${c}</span></span>`).join('')}
+        </div>
+      </details>
+    </div>`, 500);
+}
+function tbxEntGo(mode) {
+  const v=document.getElementById('tbx-ent-in')?.value||'';
+  let out='';
+  if(mode==='enc'){
+    const d=document.createElement('div'); d.textContent=v; out=d.innerHTML;
+  } else {
+    const d=document.createElement('div'); d.innerHTML=v; out=d.textContent;
+  }
+  document.getElementById('tbx-ent-out').value=out;
+}
+
+function tbxMetaTags() {
+  _tbxModal('Meta Tag Generator', 'fa-tags', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label style="font-size:11px;color:var(--text-dim)">Title<input id="mt-title" placeholder="My Page Title" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;outline:none" oninput="tbxMTCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Author<input id="mt-author" placeholder="Your Name" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;outline:none" oninput="tbxMTCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim)">OG Image URL<input id="mt-img" placeholder="https://…/image.png" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;outline:none" oninput="tbxMTCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Theme Colour<input type="color" id="mt-color" value="#6366f1" style="display:block;margin-top:3px;width:100%;height:30px;border:none;border-radius:5px;cursor:pointer" oninput="tbxMTCalc()"></label>
+      </div>
+      <label style="font-size:11px;color:var(--text-dim)">Description<textarea id="mt-desc" rows="2" placeholder="A short description of the page…" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;resize:none;outline:none" oninput="tbxMTCalc()"></textarea></label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="tbxMTCalc()" class="btn btn-primary" style="height:28px;padding:0 12px;font-size:11px">Generate</button>
+        <button onclick="navigator.clipboard.writeText(document.getElementById('mt-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px;margin-left:auto"><i class="fas fa-copy"></i></button>
+        <button onclick="if(editor){const v=editor.getValue();editor.setValue(v.replace('</head>',document.getElementById('mt-out').value+'\\n</head>'));showToast('Inserted into &lt;head&gt;','success')}" class="btn btn-subtle" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-code"></i> Insert</button>
+      </div>
+      <textarea id="mt-out" rows="8" readonly style="width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:11px;resize:vertical;outline:none"></textarea>
+    </div>`, 560);
+  setTimeout(tbxMTCalc, 50);
+}
+function tbxMTCalc() {
+  const t=document.getElementById('mt-title')?.value||'';
+  const d=document.getElementById('mt-desc')?.value||'';
+  const a=document.getElementById('mt-author')?.value||'';
+  const img=document.getElementById('mt-img')?.value||'';
+  const col=document.getElementById('mt-color')?.value||'#6366f1';
+  const lines=[
+    '<!-- Primary -->',
+    t?`<title>${t}</title>`:'',
+    d?`<meta name="description" content="${d}">`:'',
+    a?`<meta name="author" content="${a}">`:'',
+    `<meta name="theme-color" content="${col}">`,
+    '',
+    '<!-- Open Graph -->',
+    t?`<meta property="og:title" content="${t}">`:'',
+    d?`<meta property="og:description" content="${d}">`:'',
+    img?`<meta property="og:image" content="${img}">`:'',
+    `<meta property="og:type" content="website">`,
+    '',
+    '<!-- Twitter Card -->',
+    `<meta name="twitter:card" content="summary_large_image">`,
+    t?`<meta name="twitter:title" content="${t}">`:'',
+    d?`<meta name="twitter:description" content="${d}">`:'',
+    img?`<meta name="twitter:image" content="${img}">`:'',
+  ].filter(l=>l!=='');
+  document.getElementById('mt-out').value=lines.join('\n');
 }
 
 function openFind() {
