@@ -192,6 +192,19 @@
 
 
 
+    [data-theme="deepslate"] {
+      --bg: linear-gradient(135deg, #2e0032, #72007f);
+      --sidebar: #93239A;
+      --panel: #450D46;
+      --text: #FF36C7;
+      --panel2: linear-gradient(135deg, #2e0032, #FF36C7);
+      --text-dim: #FF3DFC;
+      --text-faint: #530844;
+      --accent: radial-gradient(circle, #7000a6, #93009f, #a800d1);
+    }
+
+
+
 
     [data-theme="matrix"] {
       --bg: #000300;
@@ -1781,6 +1794,12 @@
       background: linear-gradient(90deg, #0ea5e9, #06b6d4);
     }
 
+    [data-theme="Deepslate"] .statusbar {
+      background: linear-gradient(135deg, #300030, #190033);
+      border-bottom: 2px solid #A31FFF;
+      color: #A31FFF;
+    }
+
     [data-theme="matrix"] .statusbar {
       background: #000800;
       border-top: 1px solid #00ff41;
@@ -3261,6 +3280,7 @@ const THEMES = {
   ocean:     { bg:'#020c18', sidebar:'#041020', accent:'#0ea5e9', label:'Ocean' },
   matrix:    { bg:'#000300', sidebar:'#000500', accent:'#00ff41', label:'Matrix' },
   light:     { bg:'#f0f0f5', sidebar:'#e4e4ec', accent:'#6366f1', label:'Light' },
+  deepslate: { bg:'#B218FF', sidebar:'#A219FF', accent:'#C504FF', label:'Deepslate' },
 };
 
 function buildThemeGrid() {
