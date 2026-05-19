@@ -1973,6 +1973,18 @@
               </div>
               <div class="tbx-item" onclick="tbxHtmlEntities()"><i class="fas fa-exchange-alt"></i> HTML Entities</div>
               <div class="tbx-item" onclick="tbxMetaTags()"><i class="fas fa-tags"></i> Meta Tag Generator</div>
+              <div class="tbx-sep"></div>
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:4px 8px 2px">CSS</div>
+              <div class="tbx-item" onclick="tbxBgMaker()"><i class="fas fa-image"></i> Background Maker</div>
+              <div class="tbx-item" onclick="tbxAnimBuilder()"><i class="fas fa-magic"></i> Animation Builder</div>
+              <div class="tbx-item" onclick="tbxTransitionBuilder()"><i class="fas fa-sliders-h"></i> Transition Builder</div>
+              <div class="tbx-item" onclick="tbxFlexHelper()"><i class="fas fa-th-large"></i> Flexbox Helper</div>
+              <div class="tbx-item" onclick="tbxBorderRadius()"><i class="fas fa-vector-square"></i> Border Radius Maker</div>
+              <div class="tbx-sep"></div>
+              <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);padding:4px 8px 2px">HTML</div>
+              <div class="tbx-item" onclick="tbxTableGen()"><i class="fas fa-table"></i> Table Generator</div>
+              <div class="tbx-item" onclick="tbxFormBuilder()"><i class="fas fa-wpforms"></i> Form Builder</div>
+              <div class="tbx-item" onclick="tbxFaviconTag()"><i class="fas fa-star"></i> Favicon Tag Helper</div>
             </div>
           </div>
           <button class="btn btn-ghost" onclick="openSettings()"><i class="fas fa-cog"></i></button>
@@ -4227,6 +4239,366 @@ function tbxMTCalc() {
     img?`<meta name="twitter:image" content="${img}">`:'',
   ].filter(l=>l!=='');
   document.getElementById('mt-out').value=lines.join('\n');
+}
+
+// ── Background Maker ───────────────────────
+function tbxBgMaker() {
+  _tbxModal('Background Maker', 'fa-image', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <label style="font-size:11px;color:var(--text-dim)">Type</label>
+        <select id="tbx-bg-type" onchange="tbxBgCalc()" style="background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option value="solid">Solid Colour</option>
+          <option value="linear">Linear Gradient</option>
+          <option value="radial">Radial Gradient</option>
+          <option value="conic">Conic Gradient</option>
+          <option value="pattern-dots">Pattern – Dots</option>
+          <option value="pattern-grid">Pattern – Grid</option>
+          <option value="pattern-stripes">Pattern – Stripes</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="tbx-bg-controls">
+        <label style="font-size:11px;color:var(--text-dim)">Colour 1<br><input type="color" id="tbx-bg-c1" value="#6366f1" oninput="tbxBgCalc()" style="width:60px;height:28px;border:none;border-radius:4px;cursor:pointer;margin-top:3px"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Colour 2<br><input type="color" id="tbx-bg-c2" value="#a78bfa" oninput="tbxBgCalc()" style="width:60px;height:28px;border:none;border-radius:4px;cursor:pointer;margin-top:3px"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Angle<br><input type="range" id="tbx-bg-angle" min="0" max="360" value="135" oninput="tbxBgCalc()" style="width:100px;accent-color:var(--accent);margin-top:8px"></label>
+      </div>
+      <div id="tbx-bg-preview" style="height:120px;border-radius:8px;border:1px solid var(--border-bright);background:#6366f1;transition:background .2s"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="tbx-bg-out" readonly style="flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:5px;padding:5px 8px;font-family:var(--font-mono);font-size:11px;outline:none">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-bg-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i></button>
+        <button onclick="if(editor){editor.trigger('tbx','type',{text:'background: '+document.getElementById('tbx-bg-out').value+';'});showToast('Inserted!','success')}" class="btn btn-subtle" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-code"></i></button>
+      </div>
+    </div>`, 500);
+  setTimeout(tbxBgCalc, 50);
+}
+function tbxBgCalc() {
+  const type = document.getElementById('tbx-bg-type')?.value;
+  const c1 = document.getElementById('tbx-bg-c1')?.value || '#6366f1';
+  const c2 = document.getElementById('tbx-bg-c2')?.value || '#a78bfa';
+  const ang = document.getElementById('tbx-bg-angle')?.value || 135;
+  let css = '';
+  if (type === 'solid') css = c1;
+  else if (type === 'linear') css = `linear-gradient(${ang}deg, ${c1}, ${c2})`;
+  else if (type === 'radial') css = `radial-gradient(circle, ${c1}, ${c2})`;
+  else if (type === 'conic') css = `conic-gradient(from ${ang}deg, ${c1}, ${c2}, ${c1})`;
+  else if (type === 'pattern-dots') css = `radial-gradient(${c1} 1.5px, ${c2} 1.5px)`;
+  else if (type === 'pattern-grid') css = `linear-gradient(${c1} 1px, transparent 1px), linear-gradient(90deg, ${c1} 1px, ${c2} 1px)`;
+  else if (type === 'pattern-stripes') css = `repeating-linear-gradient(${ang}deg, ${c1} 0px, ${c1} 10px, ${c2} 10px, ${c2} 20px)`;
+  const prev = document.getElementById('tbx-bg-preview');
+  if (prev) { prev.style.background = css; if (type.startsWith('pattern')) { prev.style.backgroundSize = '20px 20px'; } else { prev.style.backgroundSize = ''; } }
+  if (document.getElementById('tbx-bg-out')) document.getElementById('tbx-bg-out').value = css;
+}
+
+// ── Animation Builder ───────────────────────
+function tbxAnimBuilder() {
+  _tbxModal('Animation Builder', 'fa-magic', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label style="font-size:11px;color:var(--text-dim)">Preset<select id="tbx-an-preset" onchange="tbxAnApplyPreset()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option value="fade">Fade In</option><option value="slide-up">Slide Up</option><option value="slide-left">Slide Left</option>
+          <option value="zoom">Zoom In</option><option value="bounce">Bounce</option><option value="spin">Spin</option><option value="pulse">Pulse</option><option value="shake">Shake</option>
+        </select></label>
+        <label style="font-size:11px;color:var(--text-dim)">Duration (s)<input type="number" id="tbx-an-dur" value="0.5" step="0.1" min="0.1" oninput="tbxAnCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;outline:none"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Delay (s)<input type="number" id="tbx-an-delay" value="0" step="0.1" min="0" oninput="tbxAnCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;outline:none"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Timing<select id="tbx-an-timing" onchange="tbxAnCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option>ease</option><option>ease-in</option><option>ease-out</option><option>ease-in-out</option><option>linear</option>
+        </select></label>
+        <label style="font-size:11px;color:var(--text-dim)">Iteration<input id="tbx-an-iter" value="1" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;outline:none" placeholder="1 or infinite" oninput="tbxAnCalc()"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Direction<select id="tbx-an-dir" onchange="tbxAnCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option>normal</option><option>reverse</option><option>alternate</option><option>alternate-reverse</option>
+        </select></label>
+      </div>
+      <div id="tbx-an-preview" style="height:70px;display:flex;align-items:center;justify-content:center;background:var(--panel2);border-radius:8px;border:1px solid var(--border)">
+        <div id="tbx-an-box" style="width:44px;height:44px;background:var(--accent);border-radius:8px"></div>
+      </div>
+      <button onclick="tbxAnPlay()" class="btn btn-primary" style="height:28px;padding:0 12px;font-size:11px;align-self:flex-start"><i class="fas fa-play"></i> Preview</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="tbx-an-out" readonly style="flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:5px;padding:5px 8px;font-family:var(--font-mono);font-size:11px;outline:none">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-an-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i></button>
+      </div>
+    </div>`, 520);
+  setTimeout(tbxAnCalc, 50);
+}
+const _tbxAnKeyframes = {
+  fade: '@keyframes tbx-fade{from{opacity:0}to{opacity:1}}',
+  'slide-up': '@keyframes tbx-slide-up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}',
+  'slide-left': '@keyframes tbx-slide-left{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}',
+  zoom: '@keyframes tbx-zoom{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}',
+  bounce: '@keyframes tbx-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}',
+  spin: '@keyframes tbx-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}',
+  pulse: '@keyframes tbx-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}',
+  shake: '@keyframes tbx-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}'
+};
+function tbxAnCalc() {
+  const p = document.getElementById('tbx-an-preset')?.value || 'fade';
+  const dur = document.getElementById('tbx-an-dur')?.value || '0.5';
+  const delay = document.getElementById('tbx-an-delay')?.value || '0';
+  const timing = document.getElementById('tbx-an-timing')?.value || 'ease';
+  const iter = document.getElementById('tbx-an-iter')?.value || '1';
+  const dir = document.getElementById('tbx-an-dir')?.value || 'normal';
+  const name = 'tbx-' + p;
+  const out = `animation: ${name} ${dur}s ${timing} ${delay}s ${iter} ${dir};`;
+  if (document.getElementById('tbx-an-out')) document.getElementById('tbx-an-out').value = out;
+}
+function tbxAnApplyPreset() { tbxAnCalc(); }
+function tbxAnPlay() {
+  const p = document.getElementById('tbx-an-preset')?.value || 'fade';
+  const dur = document.getElementById('tbx-an-dur')?.value || '0.5';
+  const delay = document.getElementById('tbx-an-delay')?.value || '0';
+  const timing = document.getElementById('tbx-an-timing')?.value || 'ease';
+  const iter = document.getElementById('tbx-an-iter')?.value || '1';
+  const dir = document.getElementById('tbx-an-dir')?.value || 'normal';
+  const name = 'tbx-' + p;
+  const box = document.getElementById('tbx-an-box');
+  if (!box) return;
+  let styleEl = document.getElementById('tbx-an-style');
+  if (!styleEl) { styleEl = document.createElement('style'); styleEl.id = 'tbx-an-style'; document.head.appendChild(styleEl); }
+  styleEl.textContent = _tbxAnKeyframes[p] || '';
+  box.style.animation = 'none';
+  box.offsetHeight;
+  box.style.animation = `${name} ${dur}s ${timing} ${delay}s ${iter} ${dir}`;
+}
+
+// ── Transition Builder ───────────────────────
+function tbxTransitionBuilder() {
+  _tbxModal('Transition Builder', 'fa-sliders-h', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label style="font-size:11px;color:var(--text-dim)">Property<select id="tbx-tr-prop" onchange="tbxTrCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option value="all">all</option><option value="opacity">opacity</option><option value="transform">transform</option><option value="background">background</option><option value="color">color</option><option value="width">width</option><option value="height">height</option><option value="border-radius">border-radius</option><option value="box-shadow">box-shadow</option>
+        </select></label>
+        <label style="font-size:11px;color:var(--text-dim)">Duration (s)<input type="number" id="tbx-tr-dur" value="0.3" step="0.05" min="0" oninput="tbxTrCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;outline:none"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Easing<select id="tbx-tr-ease" onchange="tbxTrCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option>ease</option><option>ease-in</option><option>ease-out</option><option>ease-in-out</option><option>linear</option><option value="cubic-bezier(0.34,1.56,0.64,1)">Spring (overshoot)</option><option value="cubic-bezier(0.25,0.46,0.45,0.94)">Smooth decelerate</option>
+        </select></label>
+        <label style="font-size:11px;color:var(--text-dim)">Delay (s)<input type="number" id="tbx-tr-delay" value="0" step="0.05" min="0" oninput="tbxTrCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;outline:none"></label>
+      </div>
+      <div id="tbx-tr-preview" style="height:70px;display:flex;align-items:center;justify-content:center;background:var(--panel2);border-radius:8px;border:1px solid var(--border)">
+        <div id="tbx-tr-box" style="width:44px;height:44px;background:var(--accent);border-radius:8px;cursor:pointer" onmouseenter="this.style.opacity='0.3';this.style.transform='scale(1.3)'" onmouseleave="this.style.opacity='1';this.style.transform='scale(1)'"></div>
+      </div>
+      <p style="font-size:10px;color:var(--text-faint);text-align:center">Hover the box to preview</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="tbx-tr-out" readonly style="flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:5px;padding:5px 8px;font-family:var(--font-mono);font-size:11px;outline:none">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-tr-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i></button>
+        <button onclick="if(editor){editor.trigger('tbx','type',{text:document.getElementById('tbx-tr-out').value});showToast('Inserted!','success')}" class="btn btn-subtle" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-code"></i></button>
+      </div>
+    </div>`, 480);
+  setTimeout(tbxTrCalc, 50);
+}
+function tbxTrCalc() {
+  const prop = document.getElementById('tbx-tr-prop')?.value || 'all';
+  const dur = document.getElementById('tbx-tr-dur')?.value || '0.3';
+  const ease = document.getElementById('tbx-tr-ease')?.value || 'ease';
+  const delay = document.getElementById('tbx-tr-delay')?.value || '0';
+  const out = `transition: ${prop} ${dur}s ${ease} ${delay}s;`;
+  if (document.getElementById('tbx-tr-out')) document.getElementById('tbx-tr-out').value = out;
+  const box = document.getElementById('tbx-tr-box');
+  if (box) box.style.transition = `opacity ${dur}s ${ease} ${delay}s, transform ${dur}s ${ease} ${delay}s`;
+}
+
+// ── Flexbox Helper ───────────────────────
+function tbxFlexHelper() {
+  _tbxModal('Flexbox Helper', 'fa-th-large', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label style="font-size:11px;color:var(--text-dim)">Direction<select id="tbx-fx-dir" onchange="tbxFxCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option>row</option><option>row-reverse</option><option>column</option><option>column-reverse</option>
+        </select></label>
+        <label style="font-size:11px;color:var(--text-dim)">Justify Content<select id="tbx-fx-jc" onchange="tbxFxCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option>flex-start</option><option>flex-end</option><option>center</option><option>space-between</option><option>space-around</option><option>space-evenly</option>
+        </select></label>
+        <label style="font-size:11px;color:var(--text-dim)">Align Items<select id="tbx-fx-ai" onchange="tbxFxCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option>stretch</option><option>flex-start</option><option>flex-end</option><option>center</option><option>baseline</option>
+        </select></label>
+        <label style="font-size:11px;color:var(--text-dim)">Wrap<select id="tbx-fx-wrap" onchange="tbxFxCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 8px;font-size:12px;outline:none">
+          <option>nowrap</option><option>wrap</option><option>wrap-reverse</option>
+        </select></label>
+        <label style="font-size:11px;color:var(--text-dim)">Gap<input type="number" id="tbx-fx-gap" value="8" min="0" oninput="tbxFxCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;outline:none"></label>
+      </div>
+      <div id="tbx-fx-preview" style="height:90px;background:var(--panel2);border-radius:8px;border:1px solid var(--border);padding:8px;display:flex;gap:8px;flex-wrap:nowrap;justify-content:flex-start;align-items:stretch">
+        <div style="background:var(--accent);border-radius:5px;width:30px;min-height:20px;opacity:.9"></div>
+        <div style="background:var(--accent2);border-radius:5px;width:30px;min-height:30px;opacity:.9"></div>
+        <div style="background:var(--accent);border-radius:5px;width:30px;min-height:16px;opacity:.9"></div>
+        <div style="background:var(--accent2);border-radius:5px;width:30px;min-height:24px;opacity:.9"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <textarea id="tbx-fx-out" rows="3" readonly style="flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:5px;padding:5px 8px;font-family:var(--font-mono);font-size:11px;outline:none;resize:none"></textarea>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-fx-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i></button>
+          <button onclick="if(editor){editor.trigger('tbx','type',{text:document.getElementById('tbx-fx-out').value});showToast('Inserted!','success')}" class="btn btn-subtle" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-code"></i></button>
+        </div>
+      </div>
+    </div>`, 500);
+  setTimeout(tbxFxCalc, 50);
+}
+function tbxFxCalc() {
+  const dir = document.getElementById('tbx-fx-dir')?.value || 'row';
+  const jc = document.getElementById('tbx-fx-jc')?.value || 'flex-start';
+  const ai = document.getElementById('tbx-fx-ai')?.value || 'stretch';
+  const wrap = document.getElementById('tbx-fx-wrap')?.value || 'nowrap';
+  const gap = document.getElementById('tbx-fx-gap')?.value || '8';
+  const prev = document.getElementById('tbx-fx-preview');
+  if (prev) { prev.style.flexDirection = dir; prev.style.justifyContent = jc; prev.style.alignItems = ai; prev.style.flexWrap = wrap; prev.style.gap = gap + 'px'; }
+  const css = `display: flex;\nflex-direction: ${dir};\njustify-content: ${jc};\nalign-items: ${ai};\nflex-wrap: ${wrap};\ngap: ${gap}px;`;
+  if (document.getElementById('tbx-fx-out')) document.getElementById('tbx-fx-out').value = css;
+}
+
+// ── Border Radius Maker ───────────────────────
+function tbxBorderRadius() {
+  _tbxModal('Border Radius Maker', 'fa-vector-square', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <label style="font-size:11px;color:var(--text-dim)">Top-Left (px)<input type="range" id="tbx-br-tl" min="0" max="100" value="8" oninput="tbxBrCalc()" style="display:block;width:100%;accent-color:var(--accent)"><span id="tbx-br-tl-v">8</span>px</label>
+        <label style="font-size:11px;color:var(--text-dim)">Top-Right (px)<input type="range" id="tbx-br-tr" min="0" max="100" value="8" oninput="tbxBrCalc()" style="display:block;width:100%;accent-color:var(--accent)"><span id="tbx-br-tr-v">8</span>px</label>
+        <label style="font-size:11px;color:var(--text-dim)">Bottom-Right (px)<input type="range" id="tbx-br-br" min="0" max="100" value="8" oninput="tbxBrCalc()" style="display:block;width:100%;accent-color:var(--accent)"><span id="tbx-br-br-v">8</span>px</label>
+        <label style="font-size:11px;color:var(--text-dim)">Bottom-Left (px)<input type="range" id="tbx-br-bl" min="0" max="100" value="8" oninput="tbxBrCalc()" style="display:block;width:100%;accent-color:var(--accent)"><span id="tbx-br-bl-v">8</span>px</label>
+      </div>
+      <div style="height:90px;display:flex;align-items:center;justify-content:center;background:var(--panel2);border-radius:8px;border:1px solid var(--border)">
+        <div id="tbx-br-preview" style="width:100px;height:60px;background:var(--accent);border-radius:8px;transition:border-radius .15s"></div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="tbx-br-out" readonly style="flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:5px;padding:5px 8px;font-family:var(--font-mono);font-size:11px;outline:none">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-br-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i></button>
+        <button onclick="if(editor){editor.trigger('tbx','type',{text:document.getElementById('tbx-br-out').value});showToast('Inserted!','success')}" class="btn btn-subtle" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-code"></i></button>
+      </div>
+    </div>`, 440);
+  setTimeout(tbxBrCalc, 50);
+}
+function tbxBrCalc() {
+  const get = id => { const el = document.getElementById(id); return el ? el.value : '8'; };
+  const tl=get('tbx-br-tl'), tr=get('tbx-br-tr'), br=get('tbx-br-br'), bl=get('tbx-br-bl');
+  ['tl','tr','br','bl'].forEach(k => { const el = document.getElementById('tbx-br-'+k+'-v'); if(el) el.textContent = get('tbx-br-'+k); });
+  const css = `border-radius: ${tl}px ${tr}px ${br}px ${bl}px;`;
+  const prev = document.getElementById('tbx-br-preview');
+  if (prev) prev.style.borderRadius = `${tl}px ${tr}px ${br}px ${bl}px`;
+  if (document.getElementById('tbx-br-out')) document.getElementById('tbx-br-out').value = css;
+}
+
+// ── Table Generator ───────────────────────
+function tbxTableGen() {
+  _tbxModal('Table Generator', 'fa-table', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <label style="font-size:11px;color:var(--text-dim)">Rows<input type="number" id="tbx-tg-rows" value="3" min="1" max="20" style="display:block;margin-top:3px;width:60px;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 6px;font-size:12px;outline:none"></label>
+        <label style="font-size:11px;color:var(--text-dim)">Cols<input type="number" id="tbx-tg-cols" value="3" min="1" max="10" style="display:block;margin-top:3px;width:60px;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:4px 6px;font-size:12px;outline:none"></label>
+        <label style="font-size:11px;color:var(--text-dim)"><input type="checkbox" id="tbx-tg-head" checked style="margin-right:4px">Header row</label>
+        <label style="font-size:11px;color:var(--text-dim)"><input type="checkbox" id="tbx-tg-border" checked style="margin-right:4px">Border</label>
+        <label style="font-size:11px;color:var(--text-dim)"><input type="checkbox" id="tbx-tg-stripe" style="margin-right:4px">Striped</label>
+        <button onclick="tbxTgCalc()" class="btn btn-primary" style="height:28px;padding:0 12px;font-size:11px;margin-top:14px">Generate</button>
+      </div>
+      <textarea id="tbx-tg-out" rows="8" readonly style="width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:11px;resize:vertical;outline:none"></textarea>
+      <div style="display:flex;gap:8px">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-tg-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i> Copy</button>
+        <button onclick="if(editor){const v=editor.getValue();editor.setValue(v+'\n'+document.getElementById('tbx-tg-out').value);showToast('Inserted!','success')}" class="btn btn-subtle" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-code"></i> Insert</button>
+      </div>
+    </div>`, 520);
+  setTimeout(tbxTgCalc, 50);
+}
+function tbxTgCalc() {
+  const rows = parseInt(document.getElementById('tbx-tg-rows')?.value||3);
+  const cols = parseInt(document.getElementById('tbx-tg-cols')?.value||3);
+  const head = document.getElementById('tbx-tg-head')?.checked;
+  const border = document.getElementById('tbx-tg-border')?.checked;
+  const stripe = document.getElementById('tbx-tg-stripe')?.checked;
+  const bAttr = border ? ' border="1" style="border-collapse:collapse"' : '';
+  const stripeStyle = stripe ? ' style="background:#f5f5f5"' : '';
+  let html = `<table${bAttr}>\n`;
+  if (head) {
+    html += '  <thead>\n    <tr>\n';
+    for (let c=0;c<cols;c++) html += `      <th>Header ${c+1}</th>\n`;
+    html += '    </tr>\n  </thead>\n';
+  }
+  html += '  <tbody>\n';
+  for (let r=0;r<rows;r++) {
+    html += `    <tr${r%2===1&&stripe?stripeStyle:''}>\n`;
+    for (let c=0;c<cols;c++) html += `      <td>Row ${r+1}, Col ${c+1}</td>\n`;
+    html += '    </tr>\n';
+  }
+  html += '  </tbody>\n</table>';
+  if (document.getElementById('tbx-tg-out')) document.getElementById('tbx-tg-out').value = html;
+}
+
+// ── Form Builder ───────────────────────
+function tbxFormBuilder() {
+  _tbxModal('Form Builder', 'fa-wpforms', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="tbxFbAdd('text')" class="btn btn-subtle" style="height:26px;padding:0 10px;font-size:11px">+ Text</button>
+        <button onclick="tbxFbAdd('email')" class="btn btn-subtle" style="height:26px;padding:0 10px;font-size:11px">+ Email</button>
+        <button onclick="tbxFbAdd('password')" class="btn btn-subtle" style="height:26px;padding:0 10px;font-size:11px">+ Password</button>
+        <button onclick="tbxFbAdd('textarea')" class="btn btn-subtle" style="height:26px;padding:0 10px;font-size:11px">+ Textarea</button>
+        <button onclick="tbxFbAdd('select')" class="btn btn-subtle" style="height:26px;padding:0 10px;font-size:11px">+ Select</button>
+        <button onclick="tbxFbAdd('checkbox')" class="btn btn-subtle" style="height:26px;padding:0 10px;font-size:11px">+ Checkbox</button>
+        <button onclick="tbxFbAdd('submit')" class="btn btn-primary" style="height:26px;padding:0 10px;font-size:11px">+ Submit</button>
+      </div>
+      <div id="tbx-fb-list" style="min-height:40px;background:var(--panel2);border-radius:6px;border:1px solid var(--border);padding:6px;font-size:11px;color:var(--text-dim)">Click + buttons above to add fields</div>
+      <textarea id="tbx-fb-out" rows="6" readonly style="width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:11px;resize:vertical;outline:none"></textarea>
+      <div style="display:flex;gap:8px">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-fb-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i> Copy</button>
+        <button onclick="tbxFbClear()" class="btn btn-danger" style="height:28px;padding:0 10px;font-size:11px">Clear</button>
+      </div>
+    </div>`, 540);
+  window._tbxFbFields = [];
+  tbxFbRender();
+}
+function tbxFbAdd(type) {
+  if (!window._tbxFbFields) window._tbxFbFields = [];
+  const label = type.charAt(0).toUpperCase()+type.slice(1);
+  window._tbxFbFields.push({type, label});
+  tbxFbRender();
+}
+function tbxFbClear() { window._tbxFbFields = []; tbxFbRender(); }
+function tbxFbRender() {
+  const fields = window._tbxFbFields || [];
+  const list = document.getElementById('tbx-fb-list');
+  if (list) {
+    if (fields.length === 0) { list.textContent = 'Click + buttons above to add fields'; }
+    else { list.innerHTML = fields.map((f,i) => `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border)"><span style="color:var(--accent2);font-family:var(--font-mono)">&lt;${f.type}&gt;</span><span style="flex:1;color:var(--text)">${f.label}</span><button onclick="window._tbxFbFields.splice(${i},1);tbxFbRender()" style="background:transparent;border:none;color:var(--danger);cursor:pointer;font-size:11px">✕</button></div>`).join(''); }
+  }
+  const out = document.getElementById('tbx-fb-out');
+  if (!out) return;
+  if (fields.length === 0) { out.value = ''; return; }
+  let html = '<form>\n';
+  fields.forEach(f => {
+    if (f.type === 'textarea') html += `  <label>${f.label}:\n    <textarea name="${f.type}" placeholder="${f.label}"></textarea>\n  </label>\n`;
+    else if (f.type === 'select') html += `  <label>${f.label}:\n    <select name="${f.type}">\n      <option>Option 1</option>\n      <option>Option 2</option>\n    </select>\n  </label>\n`;
+    else if (f.type === 'checkbox') html += `  <label><input type="checkbox" name="${f.type}"> ${f.label}</label>\n`;
+    else if (f.type === 'submit') html += `  <button type="submit">Submit</button>\n`;
+    else html += `  <label>${f.label}:\n    <input type="${f.type}" name="${f.type}" placeholder="${f.label}">\n  </label>\n`;
+  });
+  html += '</form>';
+  out.value = html;
+}
+
+// ── Favicon Tag Helper ───────────────────────
+function tbxFaviconTag() {
+  _tbxModal('Favicon Tag Helper', 'fa-star', `
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <label style="font-size:11px;color:var(--text-dim)">Favicon URL / Path<input id="tbx-fv-url" value="/favicon.ico" oninput="tbxFvCalc()" style="display:block;margin-top:3px;width:100%;background:var(--panel2);border:1px solid var(--border-bright);color:var(--text);border-radius:5px;padding:5px 8px;font-size:12px;font-family:var(--font-mono);outline:none"></label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="document.getElementById('tbx-fv-url').value='/favicon.ico';tbxFvCalc()" class="btn btn-subtle" style="height:26px;padding:0 10px;font-size:11px">.ico</button>
+        <button onclick="document.getElementById('tbx-fv-url').value='/favicon.png';tbxFvCalc()" class="btn btn-subtle" style="height:26px;padding:0 10px;font-size:11px">.png</button>
+        <button onclick="document.getElementById('tbx-fv-url').value='/favicon.svg';tbxFvCalc()" class="btn btn-subtle" style="height:26px;padding:0 10px;font-size:11px">.svg</button>
+      </div>
+      <textarea id="tbx-fv-out" rows="6" readonly style="width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text-dim);border-radius:6px;padding:8px 10px;font-family:var(--font-mono);font-size:11px;resize:none;outline:none"></textarea>
+      <div style="display:flex;gap:8px">
+        <button onclick="navigator.clipboard.writeText(document.getElementById('tbx-fv-out').value);showToast('Copied!','success')" class="btn btn-ghost" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-copy"></i> Copy</button>
+        <button onclick="if(editor){const v=editor.getValue();editor.setValue(v.replace('</head>',document.getElementById('tbx-fv-out').value+'\n</head>'));showToast('Inserted into &lt;head&gt;!','success')}" class="btn btn-subtle" style="height:28px;padding:0 10px;font-size:11px"><i class="fas fa-code"></i> Insert into &lt;head&gt;</button>
+      </div>
+    </div>`, 480);
+  setTimeout(tbxFvCalc, 50);
+}
+function tbxFvCalc() {
+  const url = document.getElementById('tbx-fv-url')?.value || '/favicon.ico';
+  const ext = url.split('.').pop().toLowerCase();
+  const type = ext === 'svg' ? 'image/svg+xml' : ext === 'png' ? 'image/png' : 'image/x-icon';
+  const tags = [
+    `<link rel="icon" href="${url}" type="${type}">`,
+    `<link rel="shortcut icon" href="${url}">`,
+    `<link rel="apple-touch-icon" href="${url}">`,
+    `<meta name="msapplication-TileImage" content="${url}">`,
+  ].join('\n');
+  if (document.getElementById('tbx-fv-out')) document.getElementById('tbx-fv-out').value = tags;
 }
 
 function openFind() {
